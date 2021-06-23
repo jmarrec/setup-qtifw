@@ -177,9 +177,19 @@ const utils_1 = __webpack_require__(918);
 function installQtIFW(downloadUrl) {
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Download from "${downloadUrl}"`);
-        const qtIFWPathDir = yield tc.downloadTool(downloadUrl);
-        core.info(`Downloaded installer at "${qtIFWPathDir}"`);
-        const qtIFWPath = path.join(qtIFWPathDir, path.basename(downloadUrl));
+        const qtIFWPathDestDir = path.join(process.env['RUNNER_TEMP'] || '', '' // uuidV4()
+        );
+        const qtIFWPathDest = path.join(qtIFWPathDestDir, path.basename(downloadUrl));
+        let qtIFWPath = '';
+        if (fs_1.default.existsSync(qtIFWPathDest)) {
+            core.info(`File already exists at ${qtIFWPathDest}`);
+            qtIFWPath = qtIFWPathDest;
+        }
+        else {
+            qtIFWPath = yield tc.downloadTool(downloadUrl, qtIFWPathDest);
+            core.info(`Downloaded installer at "${qtIFWPath}"`);
+        }
+        core.debug(`qtIFWPathDest=${qtIFWPathDest}`);
         core.info(`Execute installer at ${qtIFWPath}`);
         try {
             yield runInstallQtIFW(qtIFWPath);
@@ -194,11 +204,11 @@ function runInstallQtIFW(qtIFWPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const workingDirectory = path.dirname(qtIFWPath) + '/';
         let exeName = path.basename(qtIFWPath);
-        core.info(`workingDirectory, qtIFWPath=${qtIFWPath}, ${workingDirectory}, ${exeName}`);
+        core.info(`qtIFWPath=${qtIFWPath}, workingDirectory=${workingDirectory}, exeName=${exeName}`);
         const scriptName = 'install_script_qtifw.qs';
         const options = {
             cwd: workingDirectory,
-            silent: false,
+            silent: true,
             listeners: {
                 stdout: (data) => {
                     core.info(data.toString().trim());
@@ -208,24 +218,41 @@ function runInstallQtIFW(qtIFWPath) {
                 }
             }
         };
-        yield exec.exec('bash', ['ls'], options);
+        yield exec.exec('bash', ['-noprofile', '--norc', '-eo', 'pipefail', '-c', 'ls -la'], options);
         const qsPath = path.join(workingDirectory, scriptName);
         fs_1.default.writeFileSync(qsPath, utils_1.QT_IFW_INSTALL_SCRIPT_QS);
         if (utils_1.IS_DARWIN) {
             // This is very annoying... but we need to mount the DMG first...
             // hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-mac-x64.dmg
             // sudo ./qtfiw_installer/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64 --verbose --script ./ci/install_script_qtifw.qs
-            yield exec.exec('bash', ['hdiutil', 'attach', '-mountpoint', './qtfiw_installer', exeName], options);
-            yield exec.exec('bash', ['ls', './qtfiw_installer/'], options);
+            yield exec.exec('bash', [
+                '-noprofile',
+                '--norc',
+                '-eo',
+                'pipefail',
+                '-c',
+                `hdiutil attach -mountpoint ./qtfiw_installer "${exeName}"`
+            ], options);
+            yield exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
             exeName =
                 'qtfiw_installer/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64';
         }
         else if (utils_1.IS_LINUX) {
             // Chmod +x the .run file
-            fs_1.default.chmodSync(qtIFWPath, '755');
+            core.info('Chmod +x');
+            yield fs_1.default.chmodSync(qtIFWPath, '755');
             // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
         }
-        yield exec.exec('bash', ['./' + exeName, '--verbose', '--script', './' + scriptName], options);
+        core.debug('Will try to run the installer now');
+        core.debug(`"${qtIFWPath}" --verbose --script ${qsPath} TargetDir="${workingDirectory}"`);
+        yield exec.exec(`"${exeName}"`, [
+            '-noprofile',
+            '--norc',
+            '-eo',
+            'pipefail',
+            '-c',
+            `${qtIFWPath} --verbose --script ${qsPath} TargetDir=${workingDirectory}`
+        ], options);
     });
 }
 
