@@ -24,6 +24,8 @@ async function run(): Promise<void> {
 
     core.info(`QtIFW Link: ${installerLink}`);
 
+    await installQtIFW.installRequiredSystemDeps();
+
     await installQtIFW.installQtIFW(installerLink);
   } catch (err) {
     core.setFailed(err.message);

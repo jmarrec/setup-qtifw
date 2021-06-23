@@ -113,3 +113,17 @@ async function runInstallQtIFW(qtIFWPath: string) {
   core.info(`Adding '${binDir}' to PATH`);
   core.addPath(binDir);
 }
+
+export async function installRequiredSystemDeps() {
+  if (process.env['GITHUB_ACTIONS']) {
+    if (IS_LINUX) {
+      // libxkbcommon-x11-0
+      core.info('Installing required system library: libxkbcommon-x11-0');
+      await exec.exec(
+        'sudo',
+        ['apt-get', '-yqq', 'install', 'libxkbcommon-x11-0'],
+        {silent: true}
+      );
+    }
+  }
+}

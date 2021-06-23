@@ -167,7 +167,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.installQtIFW = void 0;
+exports.installRequiredSystemDeps = exports.installQtIFW = void 0;
 const fs_1 = __importDefault(__webpack_require__(5747));
 const path = __importStar(__webpack_require__(5622));
 const core = __importStar(__webpack_require__(2186));
@@ -261,6 +261,19 @@ function runInstallQtIFW(qtIFWPath) {
         core.addPath(binDir);
     });
 }
+function installRequiredSystemDeps() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (process.env['GITHUB_ACTIONS']) {
+            if (utils_1.IS_LINUX) {
+                // libxkbcommon-x11-0
+                core.info("Installing required system library: libxkbcommon-x11-0");
+                yield exec.exec('sudo', ['apt-get', '-yqq', 'install', 'libxkbcommon-x11-0'], { silent: true });
+            }
+        }
+    });
+}
+exports.installRequiredSystemDeps = installRequiredSystemDeps;
+;
 
 
 /***/ }),
@@ -315,6 +328,7 @@ function run() {
             core.debug(`Will look for ${qtIfwVersion} with extension '${installerExtension}'`);
             const installerLink = yield findQtIFW.getInstallerLinkForSpecificVersion(qtIfwVersion, installerExtension);
             core.info(`QtIFW Link: ${installerLink}`);
+            yield installQtIFW.installRequiredSystemDeps();
             yield installQtIFW.installQtIFW(installerLink);
         }
         catch (err) {
