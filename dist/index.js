@@ -367,7 +367,9 @@ function run() {
             core.debug(`Will look for ${qtIfwVersion} with extension '${installerExtension}'`);
             const installerLink = yield findQtIFW.getInstallerLinkForSpecificVersion(qtIfwVersion, installerExtension);
             core.info(`QtIFW Link: ${installerLink}`);
+            core.info("System deps");
             yield installQtIFW.installRequiredSystemDeps();
+            core.info("Launching install");
             yield installQtIFW.installQtIFW(installerLink);
         }
         catch (err) {

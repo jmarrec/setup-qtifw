@@ -60,7 +60,7 @@ test('test runs', async () => {
   const installDirectory = path.join(workingDirectory, 'install');
 
   // Wipe the install if it exists...
-  deleteFolderRecursive(installDirectory);
+  deleteFolderRecursive(workingDirectory);
 
   process.env['INPUT_QTIFW-VERSION'] = '4.x';
   const np = process.execPath;
