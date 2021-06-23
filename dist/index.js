@@ -53,19 +53,19 @@ function requestQtIndex(requestedVersion) {
         const resp = yield axios_1.default
             .get(exports.ROOT_QTIFW_URL)
             .then((response) => {
-            const versions = parseQtIndex(response.data);
-            const maxVersion = semver.maxSatisfying(versions, requestedVersion);
-            if (maxVersion == null) {
-                throw new Error('Invalid version given: available versions are: { versions }');
-            }
-            return maxVersion.version;
+            return response.data;
         })
             .catch((error) => {
             // handle error
             console.log(error);
-            throw 'Failed';
+            throw `Failed request to '${exports.ROOT_QTIFW_URL}'`;
         });
-        return resp;
+        const versions = parseQtIndex(resp);
+        const maxVersion = semver.maxSatisfying(versions, requestedVersion);
+        if (maxVersion == null) {
+            throw new Error(`Invalid version given: available versions are: ${versions}`);
+        }
+        return maxVersion.version;
     });
 }
 exports.requestQtIndex = requestQtIndex;
@@ -117,10 +117,10 @@ function getInstallerLinkForSpecificVersion(requestedVersion, installerExtension
             .catch((error) => {
             // handle error
             console.log(error);
-            throw 'Failed';
+            throw `Failed request to '${qtPageUrl}'`;
         });
         if (installerLink == null) {
-            throw 'Couldnt locate';
+            throw `Couldn't locate specific installer for version '${requestedVersion}' and extension '${installerExtension}'`;
         }
         return installerLink.replace('https:', 'http:');
     });
@@ -367,9 +367,9 @@ function run() {
             core.debug(`Will look for ${qtIfwVersion} with extension '${installerExtension}'`);
             const installerLink = yield findQtIFW.getInstallerLinkForSpecificVersion(qtIfwVersion, installerExtension);
             core.info(`QtIFW Link: ${installerLink}`);
-            core.info("System deps");
+            core.info('System deps');
             yield installQtIFW.installRequiredSystemDeps();
-            core.info("Launching install");
+            core.info('Launching install');
             yield installQtIFW.installQtIFW(installerLink);
         }
         catch (err) {

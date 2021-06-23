@@ -16,22 +16,22 @@ export async function requestQtIndex(
   const resp = await axios
     .get(ROOT_QTIFW_URL)
     .then((response: AxiosResponse) => {
-      const versions = parseQtIndex(response.data);
-      const maxVersion = semver.maxSatisfying(versions, requestedVersion);
-      if (maxVersion == null) {
-        throw new Error(
-          'Invalid version given: available versions are: { versions }'
-        );
-      }
-      return maxVersion.version;
+      return response.data;
     })
     .catch((error: AxiosError) => {
       // handle error
       console.log(error);
-      throw 'Failed';
+      throw `Failed request to '${ROOT_QTIFW_URL}'`;
     });
 
-  return resp;
+  const versions = parseQtIndex(resp);
+  const maxVersion = semver.maxSatisfying(versions, requestedVersion);
+  if (maxVersion == null) {
+    throw new Error(
+      `Invalid version given: available versions are: ${versions}`
+    );
+  }
+  return maxVersion.version;
 }
 
 function parseQtIndex(html: string) {
@@ -88,11 +88,11 @@ export async function getInstallerLinkForSpecificVersion(
     .catch((error: AxiosError) => {
       // handle error
       console.log(error);
-      throw 'Failed';
+      throw `Failed request to '${qtPageUrl}'`;
     });
 
   if (installerLink == null) {
-    throw 'Couldnt locate';
+    throw `Couldn't locate specific installer for version '${requestedVersion}' and extension '${installerExtension}'`;
   }
   return installerLink.replace('https:', 'http:');
 }

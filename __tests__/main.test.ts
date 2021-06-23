@@ -1,9 +1,6 @@
 import * as findQtIFW from '../src/find-qtifw';
 import * as installQtIFW from '../src/install-qtifw';
-import {deleteFolderRecursive} from '../src/utils';
 
-import * as process from 'process';
-import * as cp from 'child_process';
 import * as path from 'path';
 
 test('Split a path', () => {
@@ -25,6 +22,12 @@ test('A major.minor is found', async () => {
 test('A major.minor.patch is found', async () => {
   const qtifwindex: string = await findQtIFW.requestQtIndex('3.1.1');
   await expect(qtifwindex).toEqual('3.1.1');
+});
+
+it('should test async errors', async () => {
+  await expect(findQtIFW.requestQtIndex('3.178.1'))
+    .rejects// At least two versions should have been found online
+    .toThrow(/Invalid version given: available versions are: \d.{10,}/);
 });
 
 test('getInstallerExtension', () => {
@@ -49,24 +52,4 @@ test('getInstallerLinkForSpecificVersion_2', async () => {
   await expect(link).toEqual(
     'http://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-macOS-x86_64-4.1.1.dmg'
   );
-});
-
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', async () => {
-  //process.env['RUNNER_TEMP'] =
-  //  process.env['RUNNER_TEMP'] || path.join(process.cwd(), '.tmp/');
-
-  const workingDirectory = installQtIFW.getWorkingQtIFWWorkingDirectory();
-  const installDirectory = path.join(workingDirectory, 'install');
-
-  // Wipe the install if it exists...
-  deleteFolderRecursive(workingDirectory);
-
-  process.env['INPUT_QTIFW-VERSION'] = '4.x';
-  const np = process.execPath;
-  const ip = path.join(__dirname, '..', 'lib', 'main.js');
-  const options: cp.ExecFileSyncOptions = {
-    env: process.env
-  };
-  console.log(cp.execFileSync(np, [ip], options).toString());
 });
