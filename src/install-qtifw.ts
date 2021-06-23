@@ -9,8 +9,10 @@ import {IS_DARWIN, IS_LINUX, QT_IFW_INSTALL_SCRIPT_QS} from './utils';
 
 export async function installQtIFW(downloadUrl: string) {
   core.info(`Download from "${downloadUrl}"`);
-  const qtIFWPath = await tc.downloadTool(downloadUrl);
-  core.info(`Downloaded installer at "${qtIFWPath}"`);
+  const qtIFWPathDir = await tc.downloadTool(downloadUrl);
+  core.info(`Downloaded installer at "${qtIFWPathDir}"`);
+
+  const qtIFWPath = path.join(qtIFWPathDir, path.basename(downloadUrl));
 
   core.info('Execute installation script');
   await runInstallQtIFW(qtIFWPath);

@@ -177,8 +177,9 @@ const utils_1 = __webpack_require__(918);
 function installQtIFW(downloadUrl) {
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Download from "${downloadUrl}"`);
-        const qtIFWPath = yield tc.downloadTool(downloadUrl);
-        core.info(`Downloaded installer at "${qtIFWPath}"`);
+        const qtIFWPathDir = yield tc.downloadTool(downloadUrl);
+        core.info(`Downloaded installer at "${qtIFWPathDir}"`);
+        const qtIFWPath = path.join(qtIFWPathDir, path.basename(downloadUrl));
         core.info('Execute installation script');
         yield runInstallQtIFW(qtIFWPath);
     });
