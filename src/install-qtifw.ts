@@ -117,14 +117,15 @@ async function runInstallQtIFW(qtIFWPath: string) {
       ],
       options
     );
-    exeName = `qtfiw_installer/${exeName.replace(
-      '.dmg',
-      '.app'
-    )}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
     options.cwd = path.join(
       workingDirectory,
       `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/`
     );
+
+    exeName = `qtfiw_installer/${exeName.replace(
+      '.dmg',
+      '.app'
+    )}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
   } else if (IS_LINUX) {
     // Chmod +x the .run file
     core.info('Chmod +x');
