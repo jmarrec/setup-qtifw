@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "setup-qtifw",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Setup QtIFW action",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,17 +15,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/jmarrec/setup-qtifw.git"
   },
   "keywords": [
     "actions",
     "node",
-    "setup"
+    "setup",
+    "C++",
+    "Qt",
+    "QtIFW"
   ],
-  "author": "",
+  "author": "Julien Marrec, EffiBEM",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.6"
+    "@actions/core": "^1.2.6",
+    "semver": "^7.1.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
