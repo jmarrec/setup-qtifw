@@ -62,7 +62,7 @@ test('test runs', async () => {
   // Wipe the install if it exists...
   deleteFolderRecursive(installDirectory);
 
-  process.env['INPUT_QTIFW-VERSION'] = '4.x';
+  process.env['INPUT_QTIFW-VERSION'] = '4.0.1';
   const np = process.execPath;
   const ip = path.join(__dirname, '..', 'lib', 'main.js');
   const options: cp.ExecFileSyncOptions = {
