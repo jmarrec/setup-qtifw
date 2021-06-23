@@ -18,6 +18,7 @@ export function getWorkingQtIFWWorkingDirectory() {
       qtIFWPathDestDir = path.join(process.env['RUNNER_TEMP'], uuidV4());
     }
   }
+
   process.env['QT_IFW_WORKING_DIR'] = qtIFWPathDestDir;
   core.debug(`Working Directory: ${qtIFWPathDestDir}`);
   return qtIFWPathDestDir;
@@ -48,7 +49,7 @@ export async function installQtIFW(downloadUrl: string) {
 }
 
 async function runInstallQtIFW(qtIFWPath: string) {
-  const workingDirectory = path.dirname(qtIFWPath) + '/';
+  const workingDirectory = path.dirname(qtIFWPath);
   let exeName = path.basename(qtIFWPath);
   core.info(
     `qtIFWPath=${qtIFWPath}, workingDirectory=${workingDirectory}, exeName=${exeName}`
@@ -117,7 +118,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
         '-eo',
         'pipefail',
         '-c',
-        `${qtIFWPath} --verbose --platform minimal --script ${qsPath} TargetDir=${installDir}`
+        `./${exeName} --verbose --platform minimal --script ./${scriptName} TargetDir=./install`
       ],
       options
     );

@@ -218,7 +218,7 @@ function installQtIFW(downloadUrl) {
 exports.installQtIFW = installQtIFW;
 function runInstallQtIFW(qtIFWPath) {
     return __awaiter(this, void 0, void 0, function* () {
-        const workingDirectory = path.dirname(qtIFWPath) + '/';
+        const workingDirectory = path.dirname(qtIFWPath);
         let exeName = path.basename(qtIFWPath);
         core.info(`qtIFWPath=${qtIFWPath}, workingDirectory=${workingDirectory}, exeName=${exeName}`);
         const scriptName = 'install_script_qtifw.qs';
@@ -250,8 +250,7 @@ function runInstallQtIFW(qtIFWPath) {
                 `hdiutil attach -mountpoint ./qtfiw_installer "${qtIFWPath}"`
             ], options);
             yield exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
-            exeName =
-                `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
+            exeName = `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
         }
         else if (utils_1.IS_LINUX) {
             // Chmod +x the .run file
@@ -269,7 +268,7 @@ function runInstallQtIFW(qtIFWPath) {
                 '-eo',
                 'pipefail',
                 '-c',
-                `${qtIFWPath} --verbose --platform minimal --script ${qsPath} TargetDir=${installDir}`
+                `./${exeName} --verbose --platform minimal --script ./${scriptName} TargetDir=./install`
             ], options);
             if (return_code != 0) {
                 throw 'Something went wrong during the installation';
