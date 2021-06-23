@@ -28,6 +28,5 @@ jobs:
         shell: bash
         run: |
           devtool --version
-          binarycreator --version
           which binarycreator
           ls -la $(which binarycreator)
