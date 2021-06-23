@@ -96,8 +96,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
       options
     );
     await exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
-    exeName =
-      `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
+    exeName = `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
   } else if (IS_LINUX) {
     // Chmod +x the .run file
     core.info('Chmod +x');
@@ -118,7 +117,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
         '-eo',
         'pipefail',
         '-c',
-        `${qtIFWPath} --verbose --script ${qsPath} TargetDir=${installDir}`
+        `${qtIFWPath} --verbose --platform minimal --script ${qsPath} TargetDir=${installDir}`
       ],
       options
     );

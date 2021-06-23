@@ -251,7 +251,7 @@ function runInstallQtIFW(qtIFWPath) {
             ], options);
             yield exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
             exeName =
-                'qtfiw_installer/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64';
+                `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
         }
         else if (utils_1.IS_LINUX) {
             // Chmod +x the .run file
@@ -269,7 +269,7 @@ function runInstallQtIFW(qtIFWPath) {
                 '-eo',
                 'pipefail',
                 '-c',
-                `${qtIFWPath} --verbose --script ${qsPath} TargetDir=${installDir}`
+                `${qtIFWPath} --verbose --platform minimal --script ${qsPath} TargetDir=${installDir}`
             ], options);
             if (return_code != 0) {
                 throw 'Something went wrong during the installation';
