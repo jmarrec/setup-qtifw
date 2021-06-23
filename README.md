@@ -13,8 +13,8 @@ See [action.yml](action.yml)
 ```yaml
 steps:
 - uses: actions/checkout@v2
-- uses: actions/setup-qtifw@v1
+- uses: jmarrec/setup-qtifw@v1
   with:
-    qtifw-version: '4.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+    qtifw-version: '4.x' # Version range or exact version of a QtIFW version to use, using SemVer's version range syntax
 - run: devtool --version
 ```
