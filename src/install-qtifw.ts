@@ -12,9 +12,9 @@ export async function installQtIFW(downloadUrl: string) {
   const qtIFWPathDir = await tc.downloadTool(downloadUrl);
   core.info(`Downloaded installer at "${qtIFWPathDir}"`);
 
-  const qtIFWPath = path.join(qtIFWPathDir, path.basename(downloadUrl));
+  const qtIFWPath = path.join(qtIFWPathDir, downloadUrl.split('/')[-1]);
 
-  core.info('Execute installation script');
+  core.info(`Execute installer at ${qtIFWPath}`);
   await runInstallQtIFW(qtIFWPath);
 }
 
@@ -24,11 +24,8 @@ async function runInstallQtIFW(qtIFWPath: string) {
 
   const scriptName = 'install_script_qtifw.qs';
 
-  const qsPath = path.join(workingDirectory, scriptName);
-  fs.writeFileSync(qsPath, QT_IFW_INSTALL_SCRIPT_QS);
-
   const options: ExecOptions = {
-    cwd: path.dirname(qtIFWPath),
+    cwd: workingDirectory,
     silent: true,
     listeners: {
       stdout: (data: Buffer) => {
@@ -39,6 +36,11 @@ async function runInstallQtIFW(qtIFWPath: string) {
       }
     }
   };
+
+  await exec.exec('bash', ['ls'], options);
+
+  const qsPath = path.join(workingDirectory, scriptName);
+  fs.writeFileSync(qsPath, QT_IFW_INSTALL_SCRIPT_QS);
 
   if (IS_DARWIN) {
     // This is very annoying... but we need to mount the DMG first...
