@@ -185,20 +185,20 @@ function installQtIFW(downloadUrl) {
             yield runInstallQtIFW(qtIFWPath);
         }
         catch (error) {
-            console.log("ERROR", error.message);
+            console.log('ERROR', error.message);
         }
     });
 }
 exports.installQtIFW = installQtIFW;
 function runInstallQtIFW(qtIFWPath) {
     return __awaiter(this, void 0, void 0, function* () {
-        const workingDirectory = path.dirname(qtIFWPath);
+        const workingDirectory = path.dirname(qtIFWPath) + '/';
         let exeName = path.basename(qtIFWPath);
         core.info(`workingDirectory, qtIFWPath=${qtIFWPath}, ${workingDirectory}, ${exeName}`);
         const scriptName = 'install_script_qtifw.qs';
         const options = {
             cwd: workingDirectory,
-            silent: true,
+            silent: false,
             listeners: {
                 stdout: (data) => {
                     core.info(data.toString().trim());

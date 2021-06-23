@@ -23,7 +23,7 @@ export async function installQtIFW(downloadUrl: string) {
 }
 
 async function runInstallQtIFW(qtIFWPath: string) {
-  const workingDirectory = path.dirname(qtIFWPath);
+  const workingDirectory = path.dirname(qtIFWPath) + '/';
   let exeName = path.basename(qtIFWPath);
   core.info(
     `workingDirectory, qtIFWPath=${qtIFWPath}, ${workingDirectory}, ${exeName}`
@@ -33,7 +33,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
 
   const options: ExecOptions = {
     cwd: workingDirectory,
-    silent: true,
+    silent: false,
     listeners: {
       stdout: (data: Buffer) => {
         core.info(data.toString().trim());
