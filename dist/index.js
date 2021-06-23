@@ -251,10 +251,10 @@ function runInstallQtIFW(qtIFWPath) {
             ], options);
             core.debug('ls ./qtfiw_installer/');
             yield exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
-            core.debug(`ls ./qtfiw_installer/${exeName}.app/Contents/MacOS/`);
-            yield exec.exec('bash', ['-c', `ls ./qtfiw_installer/${exeName}.app/Contents/MacOS/`], options);
-            exeName = `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
-            options.cwd = path.join(workingDirectory, `qtfiw_installer/${exeName}.app/Contents/MacOS/`);
+            core.debug(`ls ./qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/${exeName.replace('.dmg', '')}/`);
+            yield exec.exec('bash', ['-c', `ls ./qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/${exeName.replace('.dmg', '')}/`], options);
+            exeName = `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
+            options.cwd = path.join(workingDirectory, `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/`);
         }
         else if (utils_1.IS_LINUX) {
             // Chmod +x the .run file

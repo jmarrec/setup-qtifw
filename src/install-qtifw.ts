@@ -98,16 +98,30 @@ async function runInstallQtIFW(qtIFWPath: string) {
     );
     core.debug('ls ./qtfiw_installer/');
     await exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
-    core.debug(`ls ./qtfiw_installer/${exeName}.app/Contents/MacOS/`);
+    core.debug(
+      `ls ./qtfiw_installer/${exeName.replace(
+        '.dmg',
+        '.app'
+      )}/Contents/MacOS/${exeName.replace('.dmg', '')}/`
+    );
     await exec.exec(
       'bash',
-      ['-c', `ls ./qtfiw_installer/${exeName}.app/Contents/MacOS/`],
+      [
+        '-c',
+        `ls ./qtfiw_installer/${exeName.replace(
+          '.dmg',
+          '.app'
+        )}/Contents/MacOS/${exeName.replace('.dmg', '')}/`
+      ],
       options
     );
-    exeName = `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
+    exeName = `qtfiw_installer/${exeName.replace(
+      '.dmg',
+      '.app'
+    )}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
     options.cwd = path.join(
       workingDirectory,
-      `qtfiw_installer/${exeName}.app/Contents/MacOS/`
+      `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/`
     );
   } else if (IS_LINUX) {
     // Chmod +x the .run file
