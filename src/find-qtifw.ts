@@ -1,14 +1,12 @@
 import * as core from '@actions/core';
 import * as url from 'url';
+import * as semver from 'semver';
 import axios, {AxiosResponse, AxiosError} from 'axios';
 import cheerio from 'cheerio';
-import * as semver from 'semver';
-import * as tc from '@actions/tool-cache';
 // import {AxiosResponse, AxiosError} from 'axios'
 
-export const IS_WINDOWS = process.platform === 'win32';
-export const IS_DARWIN = process.platform === 'darwin';
-export const IS_LINUX = process.platform === 'linux';
+import {IS_WINDOWS, IS_DARWIN, IS_LINUX} from './utils';
+
 export const ROOT_QTIFW_URL =
   'https://download.qt.io/official_releases/qt-installer-framework/';
 

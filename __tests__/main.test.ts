@@ -45,7 +45,7 @@ test('getInstallerLinkForSpecificVersion_2', async () => {
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', async () => {
-  process.env['INPUT_QTIFW-VERSION'] = '4.1';
+  process.env['INPUT_QTIFW-VERSION'] = '4.x';
   const np = process.execPath;
   const ip = path.join(__dirname, '..', 'lib', 'main.js');
   const options: cp.ExecFileSyncOptions = {
