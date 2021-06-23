@@ -98,6 +98,10 @@ async function runInstallQtIFW(qtIFWPath: string) {
     );
     await exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
     exeName = `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
+    options.cwd = path.join(
+      workingDirectory,
+      `qtfiw_installer/${exeName}.app/Contents/MacOS/`
+    );
   } else if (IS_LINUX) {
     // Chmod +x the .run file
     core.info('Chmod +x');
