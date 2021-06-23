@@ -15,12 +15,19 @@ export async function installQtIFW(downloadUrl: string) {
   const qtIFWPath = path.join(qtIFWPathDir, path.basename(downloadUrl));
 
   core.info(`Execute installer at ${qtIFWPath}`);
-  await runInstallQtIFW(qtIFWPath);
+  try {
+    await runInstallQtIFW(qtIFWPath);
+  } catch (error) {
+    console.log('ERROR', error.message);
+  }
 }
 
 async function runInstallQtIFW(qtIFWPath: string) {
   const workingDirectory = path.dirname(qtIFWPath);
   let exeName = path.basename(qtIFWPath);
+  core.info(
+    `workingDirectory, qtIFWPath=${qtIFWPath}, ${workingDirectory}, ${exeName}`
+  );
 
   const scriptName = 'install_script_qtifw.qs';
 
