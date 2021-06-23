@@ -179,8 +179,8 @@ function installQtIFW(downloadUrl) {
         core.info(`Download from "${downloadUrl}"`);
         const qtIFWPathDir = yield tc.downloadTool(downloadUrl);
         core.info(`Downloaded installer at "${qtIFWPathDir}"`);
-        const qtIFWPath = path.join(qtIFWPathDir, path.basename(downloadUrl));
-        core.info('Execute installation script');
+        const qtIFWPath = path.join(qtIFWPathDir, downloadUrl.split('/')[-1]);
+        core.info(`Execute installer at ${qtIFWPath}`);
         yield runInstallQtIFW(qtIFWPath);
     });
 }
@@ -190,10 +190,8 @@ function runInstallQtIFW(qtIFWPath) {
         const workingDirectory = path.dirname(qtIFWPath);
         let exeName = path.basename(qtIFWPath);
         const scriptName = 'install_script_qtifw.qs';
-        const qsPath = path.join(workingDirectory, scriptName);
-        fs_1.default.writeFileSync(qsPath, utils_1.QT_IFW_INSTALL_SCRIPT_QS);
         const options = {
-            cwd: path.dirname(qtIFWPath),
+            cwd: workingDirectory,
             silent: true,
             listeners: {
                 stdout: (data) => {
@@ -204,6 +202,9 @@ function runInstallQtIFW(qtIFWPath) {
                 }
             }
         };
+        yield exec.exec('bash', ['ls'], options);
+        const qsPath = path.join(workingDirectory, scriptName);
+        fs_1.default.writeFileSync(qsPath, utils_1.QT_IFW_INSTALL_SCRIPT_QS);
         if (utils_1.IS_DARWIN) {
             // This is very annoying... but we need to mount the DMG first...
             // hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-mac-x64.dmg
