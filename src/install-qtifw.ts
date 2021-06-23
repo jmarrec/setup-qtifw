@@ -111,7 +111,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
         `ls ./qtfiw_installer/${exeName.replace(
           '.dmg',
           '.app'
-        )}/Contents/MacOS/${exeName.replace('.dmg', '')}/`
+        )}/Contents/MacOS/`
       ],
       options
     );
