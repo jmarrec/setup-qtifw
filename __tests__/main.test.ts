@@ -51,7 +51,6 @@ test('getInstallerLinkForSpecificVersion_2', async () => {
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', async () => {
-  process.env['RUNNER_TEMP'] = process.env['RUNNER_TEMP'] || path.join(process.cwd(), '.tmp/');
   console.log(`RUNNER_TEMP=${process.env['RUNNER_TEMP']}`);
   process.env['INPUT_QTIFW-VERSION'] = '4.x';
   const np = process.execPath;

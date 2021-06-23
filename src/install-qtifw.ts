@@ -11,10 +11,10 @@ import {IS_DARWIN, IS_LINUX, QT_IFW_INSTALL_SCRIPT_QS} from './utils';
 export async function installQtIFW(downloadUrl: string) {
   core.info(`Download from "${downloadUrl}"`);
 
-  const qtIFWPathDestDir = path.join(
-    process.env['RUNNER_TEMP'] || '',
-    '' // uuidV4()
-  );
+  let qtIFWPathDestDir: string = path.join(process.cwd(), '.tmp/');
+  if (process.env['RUNNER_TEMP']) {
+    qtIFWPathDestDir = path.join(process.env['RUNNER_TEMP'], uuidV4());
+  }
   const qtIFWPathDest = path.join(qtIFWPathDestDir, path.basename(downloadUrl));
 
   let qtIFWPath: string = '';
@@ -94,10 +94,10 @@ async function runInstallQtIFW(qtIFWPath: string) {
   }
   core.debug('Will try to run the installer now');
   core.debug(
-    `"${qtIFWPath}" --verbose --script ${qsPath} TargetDir="${workingDirectory}"`
+    `"${qtIFWPath} --verbose --script ${qsPath} TargetDir=${workingDirectory}"`
   );
   await exec.exec(
-    `"${exeName}"`,
+    'bash',
     [
       '-noprofile',
       '--norc',
@@ -108,4 +108,8 @@ async function runInstallQtIFW(qtIFWPath: string) {
     ],
     options
   );
+
+  const binDir = path.join(workingDirectory, 'bin/');
+  core.info(`Adding '${binDir}' to PATH`);
+  core.addPath(binDir);
 }
