@@ -12,7 +12,7 @@ export async function installQtIFW(downloadUrl: string) {
   const qtIFWPathDir = await tc.downloadTool(downloadUrl);
   core.info(`Downloaded installer at "${qtIFWPathDir}"`);
 
-  const qtIFWPath = path.join(qtIFWPathDir, downloadUrl.split('/')[-1]);
+  const qtIFWPath = path.join(qtIFWPathDir, path.basename(downloadUrl));
 
   core.info(`Execute installer at ${qtIFWPath}`);
   await runInstallQtIFW(qtIFWPath);

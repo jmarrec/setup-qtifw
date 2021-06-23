@@ -4,6 +4,12 @@ import * as process from 'process';
 import * as cp from 'child_process';
 import * as path from 'path';
 
+test('Split a path', () => {
+  const link =
+    'http://download.qt.io/official_releases/qt-installer-framework/3.1.1/QtInstallerFramework-linux-x64.run';
+  console.log(path.basename(link));
+});
+
 test('A Major is found', async () => {
   const qtifwindex: string = await findQtIFW.requestQtIndex('3.x');
   await expect(qtifwindex).toEqual('3.2.2');
