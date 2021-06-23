@@ -122,7 +122,7 @@ function getInstallerLinkForSpecificVersion(requestedVersion, installerExtension
         if (installerLink == null) {
             throw 'Couldnt locate';
         }
-        return installerLink;
+        return installerLink.replace('https:', 'http:');
     });
 }
 exports.getInstallerLinkForSpecificVersion = getInstallerLinkForSpecificVersion;
@@ -209,14 +209,15 @@ function runInstallQtIFW(qtIFWPath) {
             // sudo ./qtfiw_installer/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64 --verbose --script ./ci/install_script_qtifw.qs
             yield exec.exec('bash', ['hdiutil', 'attach', '-mountpoint', './qtfiw_installer', exeName], options);
             yield exec.exec('bash', ['ls', './qtfiw_installer/'], options);
-            exeName = 'qtfiw_installer/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64';
+            exeName =
+                'qtfiw_installer/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64';
         }
         else if (utils_1.IS_LINUX) {
             // Chmod +x the .run file
             fs_1.default.chmodSync(qtIFWPath, '755');
             // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
         }
-        yield exec.exec('bash', ["./" + exeName, "--verbose", "--script", './' + scriptName], options);
+        yield exec.exec('bash', ['./' + exeName, '--verbose', '--script', './' + scriptName], options);
     });
 }
 

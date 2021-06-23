@@ -29,7 +29,7 @@ test('getInstallerLinkForSpecificVersion', async () => {
     'run'
   );
   await expect(link).toEqual(
-    'https://download.qt.io/official_releases/qt-installer-framework/3.1.1/QtInstallerFramework-linux-x64.run'
+    'http://download.qt.io/official_releases/qt-installer-framework/3.1.1/QtInstallerFramework-linux-x64.run'
   );
 });
 
@@ -39,7 +39,7 @@ test('getInstallerLinkForSpecificVersion_2', async () => {
     'dmg'
   );
   await expect(link).toEqual(
-    'https://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-macOS-x86_64-4.1.1.dmg'
+    'http://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-macOS-x86_64-4.1.1.dmg'
   );
 });
 

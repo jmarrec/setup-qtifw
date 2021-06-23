@@ -94,5 +94,5 @@ export async function getInstallerLinkForSpecificVersion(
   if (installerLink == null) {
     throw 'Couldnt locate';
   }
-  return installerLink;
+  return installerLink.replace('https:', 'http:');
 }
