@@ -167,7 +167,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.installRequiredSystemDeps = exports.installQtIFW = void 0;
+exports.installRequiredSystemDeps = exports.installQtIFW = exports.getWorkingQtIFWWorkingDirectory = void 0;
 const fs_1 = __importDefault(__webpack_require__(5747));
 const path = __importStar(__webpack_require__(5622));
 const core = __importStar(__webpack_require__(2186));
@@ -175,13 +175,26 @@ const tc = __importStar(__webpack_require__(7784));
 const exec = __importStar(__webpack_require__(1514));
 const uuid_1 = __webpack_require__(2155);
 const utils_1 = __webpack_require__(918);
-function installQtIFW(downloadUrl) {
-    return __awaiter(this, void 0, void 0, function* () {
-        core.info(`Download from "${downloadUrl}"`);
-        let qtIFWPathDestDir = path.join(process.cwd(), '.tmp/');
+function getWorkingQtIFWWorkingDirectory() {
+    let qtIFWPathDestDir;
+    if (process.env['QT_IFW_WORKING_DIR']) {
+        qtIFWPathDestDir = process.env['QT_IFW_WORKING_DIR'];
+    }
+    else {
+        qtIFWPathDestDir = path.join(process.cwd(), '.tmp/');
         if (process.env['RUNNER_TEMP']) {
             qtIFWPathDestDir = path.join(process.env['RUNNER_TEMP'], uuid_1.v4());
         }
+    }
+    process.env['QT_IFW_WORKING_DIR'] = qtIFWPathDestDir;
+    core.debug(`Working Directory: ${qtIFWPathDestDir}`);
+    return qtIFWPathDestDir;
+}
+exports.getWorkingQtIFWWorkingDirectory = getWorkingQtIFWWorkingDirectory;
+function installQtIFW(downloadUrl) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.info(`Download from "${downloadUrl}"`);
+        const qtIFWPathDestDir = getWorkingQtIFWWorkingDirectory();
         const qtIFWPathDest = path.join(qtIFWPathDestDir, path.basename(downloadUrl));
         let qtIFWPath = '';
         if (fs_1.default.existsSync(qtIFWPathDest)) {
@@ -234,7 +247,7 @@ function runInstallQtIFW(qtIFWPath) {
                 '-eo',
                 'pipefail',
                 '-c',
-                `hdiutil attach -mountpoint ./qtfiw_installer "${exeName}"`
+                `hdiutil attach -mountpoint ./qtfiw_installer "${qtIFWPath}"`
             ], options);
             yield exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
             exeName =
@@ -247,17 +260,27 @@ function runInstallQtIFW(qtIFWPath) {
             // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
         }
         core.debug('Will try to run the installer now');
-        core.debug(`"${qtIFWPath} --verbose --script ${qsPath} TargetDir=${workingDirectory}"`);
-        yield exec.exec('bash', [
-            '-noprofile',
-            '--norc',
-            '-eo',
-            'pipefail',
-            '-c',
-            `${qtIFWPath} --verbose --script ${qsPath} TargetDir=${workingDirectory}`
-        ], options);
-        const binDir = path.join(workingDirectory, 'bin/');
+        const installDir = path.join(workingDirectory, 'install');
+        core.debug(`${qtIFWPath} --verbose --script ${qsPath} TargetDir=${installDir}`);
+        try {
+            const return_code = yield exec.exec('bash', [
+                '-noprofile',
+                '--norc',
+                '-eo',
+                'pipefail',
+                '-c',
+                `${qtIFWPath} --verbose --script ${qsPath} TargetDir=${installDir}`
+            ], options);
+            if (return_code != 0) {
+                throw 'Something went wrong during the installation';
+            }
+        }
+        catch (error) {
+            throw 'Something went wrong during the installation' + error.message;
+        }
+        const binDir = path.join(installDir, 'bin/');
         core.info(`Adding '${binDir}' to PATH`);
+        core.setOutput('qtifw-bin-dir', binDir);
         core.addPath(binDir);
     });
 }
@@ -266,14 +289,20 @@ function installRequiredSystemDeps() {
         if (process.env['GITHUB_ACTIONS']) {
             if (utils_1.IS_LINUX) {
                 // libxkbcommon-x11-0
-                core.info("Installing required system library: libxkbcommon-x11-0");
-                yield exec.exec('sudo', ['apt-get', '-yqq', 'install', 'libxkbcommon-x11-0'], { silent: true });
+                core.info('Installing required system library: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev');
+                yield exec.exec('sudo', [
+                    'apt-get',
+                    '-yqq',
+                    'install',
+                    'libxkbcommon-x11-0',
+                    'xorg-dev',
+                    'libgl1-mesa-dev'
+                ], { silent: true });
             }
         }
     });
 }
 exports.installRequiredSystemDeps = installRequiredSystemDeps;
-;
 
 
 /***/ }),
@@ -342,15 +371,57 @@ run();
 /***/ }),
 
 /***/ 918:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.QT_IFW_INSTALL_SCRIPT_QS = exports.IS_LINUX = exports.IS_DARWIN = exports.IS_WINDOWS = void 0;
+exports.QT_IFW_INSTALL_SCRIPT_QS = exports.deleteFolderRecursive = exports.IS_LINUX = exports.IS_DARWIN = exports.IS_WINDOWS = void 0;
+const fs_1 = __importDefault(__webpack_require__(5747));
+const path = __importStar(__webpack_require__(5622));
 exports.IS_WINDOWS = process.platform === 'win32';
 exports.IS_DARWIN = process.platform === 'darwin';
 exports.IS_LINUX = process.platform === 'linux';
+function deleteFolderRecursive(directoryPath) {
+    if (fs_1.default.existsSync(directoryPath)) {
+        // console.log(`Wipping directory ${directoryPath}`);
+        fs_1.default.readdirSync(directoryPath).forEach((file, index) => {
+            const curPath = path.join(directoryPath, file);
+            if (fs_1.default.lstatSync(curPath).isDirectory()) {
+                // recurse
+                deleteFolderRecursive(curPath);
+            }
+            else {
+                // delete file
+                fs_1.default.unlinkSync(curPath);
+            }
+        });
+        fs_1.default.rmdirSync(directoryPath);
+    }
+}
+exports.deleteFolderRecursive = deleteFolderRecursive;
 exports.QT_IFW_INSTALL_SCRIPT_QS = `
 function Controller() {
   installer.autoRejectMessageBoxes();

@@ -8,13 +8,25 @@ import {ExecOptions} from '@actions/exec/lib/interfaces';
 
 import {IS_DARWIN, IS_LINUX, QT_IFW_INSTALL_SCRIPT_QS} from './utils';
 
+export function getWorkingQtIFWWorkingDirectory() {
+  let qtIFWPathDestDir: string;
+  if (process.env['QT_IFW_WORKING_DIR']) {
+    qtIFWPathDestDir = process.env['QT_IFW_WORKING_DIR'];
+  } else {
+    qtIFWPathDestDir = path.join(process.cwd(), '.tmp/');
+    if (process.env['RUNNER_TEMP']) {
+      qtIFWPathDestDir = path.join(process.env['RUNNER_TEMP'], uuidV4());
+    }
+  }
+  process.env['QT_IFW_WORKING_DIR'] = qtIFWPathDestDir;
+  core.debug(`Working Directory: ${qtIFWPathDestDir}`);
+  return qtIFWPathDestDir;
+}
+
 export async function installQtIFW(downloadUrl: string) {
   core.info(`Download from "${downloadUrl}"`);
 
-  let qtIFWPathDestDir: string = path.join(process.cwd(), '.tmp/');
-  if (process.env['RUNNER_TEMP']) {
-    qtIFWPathDestDir = path.join(process.env['RUNNER_TEMP'], uuidV4());
-  }
+  const qtIFWPathDestDir = getWorkingQtIFWWorkingDirectory();
   const qtIFWPathDest = path.join(qtIFWPathDestDir, path.basename(downloadUrl));
 
   let qtIFWPath: string = '';
@@ -79,7 +91,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
         '-eo',
         'pipefail',
         '-c',
-        `hdiutil attach -mountpoint ./qtfiw_installer "${exeName}"`
+        `hdiutil attach -mountpoint ./qtfiw_installer "${qtIFWPath}"`
       ],
       options
     );
@@ -93,24 +105,33 @@ async function runInstallQtIFW(qtIFWPath: string) {
     // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
   }
   core.debug('Will try to run the installer now');
+  const installDir = path.join(workingDirectory, 'install');
   core.debug(
-    `"${qtIFWPath} --verbose --script ${qsPath} TargetDir=${workingDirectory}"`
+    `${qtIFWPath} --verbose --script ${qsPath} TargetDir=${installDir}`
   );
-  await exec.exec(
-    'bash',
-    [
-      '-noprofile',
-      '--norc',
-      '-eo',
-      'pipefail',
-      '-c',
-      `${qtIFWPath} --verbose --script ${qsPath} TargetDir=${workingDirectory}`
-    ],
-    options
-  );
+  try {
+    const return_code = await exec.exec(
+      'bash',
+      [
+        '-noprofile',
+        '--norc',
+        '-eo',
+        'pipefail',
+        '-c',
+        `${qtIFWPath} --verbose --script ${qsPath} TargetDir=${installDir}`
+      ],
+      options
+    );
+    if (return_code != 0) {
+      throw 'Something went wrong during the installation';
+    }
+  } catch (error) {
+    throw 'Something went wrong during the installation' + error.message;
+  }
 
-  const binDir = path.join(workingDirectory, 'bin/');
+  const binDir = path.join(installDir, 'bin/');
   core.info(`Adding '${binDir}' to PATH`);
+  core.setOutput('qtifw-bin-dir', binDir);
   core.addPath(binDir);
 }
 
@@ -118,10 +139,19 @@ export async function installRequiredSystemDeps() {
   if (process.env['GITHUB_ACTIONS']) {
     if (IS_LINUX) {
       // libxkbcommon-x11-0
-      core.info('Installing required system library: libxkbcommon-x11-0');
+      core.info(
+        'Installing required system library: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev'
+      );
       await exec.exec(
         'sudo',
-        ['apt-get', '-yqq', 'install', 'libxkbcommon-x11-0'],
+        [
+          'apt-get',
+          '-yqq',
+          'install',
+          'libxkbcommon-x11-0',
+          'xorg-dev',
+          'libgl1-mesa-dev'
+        ],
         {silent: true}
       );
     }

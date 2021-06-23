@@ -1,6 +1,26 @@
+import fs from 'fs';
+import * as path from 'path';
+
 export const IS_WINDOWS = process.platform === 'win32';
 export const IS_DARWIN = process.platform === 'darwin';
 export const IS_LINUX = process.platform === 'linux';
+
+export function deleteFolderRecursive(directoryPath: string) {
+  if (fs.existsSync(directoryPath)) {
+    // console.log(`Wipping directory ${directoryPath}`);
+    fs.readdirSync(directoryPath).forEach((file, index) => {
+      const curPath = path.join(directoryPath, file);
+      if (fs.lstatSync(curPath).isDirectory()) {
+        // recurse
+        deleteFolderRecursive(curPath);
+      } else {
+        // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(directoryPath);
+  }
+}
 
 export const QT_IFW_INSTALL_SCRIPT_QS = `
 function Controller() {

@@ -9,6 +9,8 @@ inputs:
 outputs:
   qtifw-version:
     description: "The installed QtIFW version. Useful when given a version range as input."
+  qtifw-bin-dir:
+    description: "The bin directory (which is already added to your PATH) for debugging purposes."
 runs:
   using: 'node12'
   main: 'dist/index.js'

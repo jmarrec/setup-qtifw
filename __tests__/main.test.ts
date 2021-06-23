@@ -1,4 +1,6 @@
 import * as findQtIFW from '../src/find-qtifw';
+import * as installQtIFW from '../src/install-qtifw';
+import {deleteFolderRecursive} from '../src/utils';
 
 import * as process from 'process';
 import * as cp from 'child_process';
@@ -51,7 +53,15 @@ test('getInstallerLinkForSpecificVersion_2', async () => {
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', async () => {
-  console.log(`RUNNER_TEMP=${process.env['RUNNER_TEMP']}`);
+  //process.env['RUNNER_TEMP'] =
+  //  process.env['RUNNER_TEMP'] || path.join(process.cwd(), '.tmp/');
+
+  const workingDirectory = installQtIFW.getWorkingQtIFWWorkingDirectory();
+  const installDirectory = path.join(workingDirectory, 'install');
+
+  // Wipe the install if it exists...
+  deleteFolderRecursive(installDirectory);
+
   process.env['INPUT_QTIFW-VERSION'] = '4.x';
   const np = process.execPath;
   const ip = path.join(__dirname, '..', 'lib', 'main.js');
