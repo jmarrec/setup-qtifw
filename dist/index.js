@@ -249,7 +249,10 @@ function runInstallQtIFW(qtIFWPath) {
                 '-c',
                 `hdiutil attach -mountpoint ./qtfiw_installer "${qtIFWPath}"`
             ], options);
+            core.debug('ls ./qtfiw_installer/');
             yield exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
+            core.debug(`ls ./qtfiw_installer/${exeName}.app/Contents/MacOS/`);
+            yield exec.exec('bash', ['-c', `ls ./qtfiw_installer/${exeName}.app/Contents/MacOS/`], options);
             exeName = `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
             options.cwd = path.join(workingDirectory, `qtfiw_installer/${exeName}.app/Contents/MacOS/`);
         }

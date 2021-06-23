@@ -96,7 +96,14 @@ async function runInstallQtIFW(qtIFWPath: string) {
       ],
       options
     );
+    core.debug('ls ./qtfiw_installer/');
     await exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
+    core.debug(`ls ./qtfiw_installer/${exeName}.app/Contents/MacOS/`);
+    await exec.exec(
+      'bash',
+      ['-c', `ls ./qtfiw_installer/${exeName}.app/Contents/MacOS/`],
+      options
+    );
     exeName = `qtfiw_installer/${exeName}.app/Contents/MacOS/${exeName}`;
     options.cwd = path.join(
       workingDirectory,
