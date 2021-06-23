@@ -7,6 +7,7 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
+
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
@@ -15,10 +16,27 @@ jobs:
           npm install
       - run: |
           npm run all
+
   test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.allow_failure }}
+    strategy:
+      # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15, macos-11]
+        qtifw-version: ['4.x', '4.0.1']
+
     steps:
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          milliseconds: 1000
+          qtifw-version: ${{ matrix.qtifw-version }}
+
+      - name: Test that the binaries are correctly added to path
+        shell: bash
+        run: |
+          devtool --version
+          binarycreator --version
+          which binarycreator
+          ls -la $(which binarycreator)
