@@ -237,6 +237,7 @@ function runInstallQtIFW(qtIFWPath) {
         yield exec.exec('bash', ['-noprofile', '--norc', '-eo', 'pipefail', '-c', 'ls -la'], options);
         const qsPath = path.join(workingDirectory, scriptName);
         fs_1.default.writeFileSync(qsPath, utils_1.QT_IFW_INSTALL_SCRIPT_QS);
+        let platformOpts = '';
         if (utils_1.IS_DARWIN) {
             // This is very annoying... but we need to mount the DMG first...
             // hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-mac-x64.dmg
@@ -264,18 +265,21 @@ function runInstallQtIFW(qtIFWPath) {
             core.info('Chmod +x');
             yield fs_1.default.chmodSync(qtIFWPath, '755');
             // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
+            platformOpts = '--platform minimal';
         }
         core.debug('Will try to run the installer now');
         const installDir = path.join(workingDirectory, 'install');
-        core.debug(`${qtIFWPath} --verbose --script ${qsPath} TargetDir=${installDir}`);
         try {
+            core.debug(`${qtIFWPath} --verbose ${platformOpts} --script ${qsPath} TargetDir=${installDir}`);
+            core.debug(`options.cwd=${options.cwd}`);
+            core.debug(`./${exeName} --verbose ${platformOpts} --script ./${scriptName} TargetDir=./install}`);
             const return_code = yield exec.exec('bash', [
                 '-noprofile',
                 '--norc',
                 '-eo',
                 'pipefail',
                 '-c',
-                `./${exeName} --verbose --platform minimal --script ./${scriptName} TargetDir=./install`
+                `./${exeName} --verbose ${platformOpts} --script ./${scriptName} TargetDir=./install`
             ], options);
             if (return_code != 0) {
                 throw 'Something went wrong during the installation';
