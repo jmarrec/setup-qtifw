@@ -1,8 +1,7 @@
 # setup-qitfw
 
-<p align="left">
-  <a href="https://github.com/jmarrec/setup-qtifw/actions"><img alt="setup-qtifw status" src="https://github.com/jmarrec/setup-qtifw/workflows/test.yml/badge.svg"></a>
-</p>
+[![runtime-test](https://github.com/jmarrec/setup-qtifw/actions/workflows/test.yml/badge.svg)](https://github.com/jmarrec/setup-qtifw/actions/workflows/test.yml)
+[![build-test](https://github.com/jmarrec/setup-qtifw/actions/workflows/test-build.yml/badge.svg)](https://github.com/jmarrec/setup-qtifw/actions/workflows/test-build.yml)
 
 This action sets up a version of the [Qt Installer Framework](https://doc.qt.io/qtinstallerframework/)
 
