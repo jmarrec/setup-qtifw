@@ -117,7 +117,8 @@ async function runInstallQtIFW(qtIFWPath: string) {
       ],
       options
     );
-    options.cwd = path.join(
+
+    qtIFWPath = path.join(
       workingDirectory,
       `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/`
     );
