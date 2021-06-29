@@ -331,6 +331,7 @@ function runInstallQtIFW(qtIFWPath) {
             ], options);
             qtIFWPath = path.join(workingDirectory, `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/`);
             exeName = `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
+            platformOpts = '--platform minimal';
         }
         else if (utils_1.IS_LINUX) {
             // Chmod +x the .run file
@@ -378,7 +379,7 @@ function installRequiredSystemDeps() {
                     'install',
                     'libxkbcommon-x11-0',
                     'xorg-dev',
-                    'libgl1-mesa-dev'
+                    'libglu1-mesa-dev',
                 ], { silent: true });
             }
         }

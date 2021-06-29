@@ -127,6 +127,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
       '.dmg',
       '.app'
     )}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
+    platformOpts = '--platform minimal';
   } else if (IS_LINUX) {
     // Chmod +x the .run file
     core.info('Chmod +x');
@@ -185,7 +186,7 @@ export async function installRequiredSystemDeps() {
           'install',
           'libxkbcommon-x11-0',
           'xorg-dev',
-          'libgl1-mesa-dev'
+          'libglu1-mesa-dev' // libglu1-mesa-dev freeglut3-dev mesa-common-dev
         ],
         {silent: true}
       );
