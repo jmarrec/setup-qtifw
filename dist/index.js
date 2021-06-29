@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getMirrorLinksForSpecificLink = exports.getInstallerLinkForSpecificVersion = exports.getInstallerExtension = exports.requestQtIndex = exports.ROOT_QTIFW_URL = void 0;
+exports.getMirrorLinkForSpecificLink = exports.getInstallerLinkForSpecificVersion = exports.getInstallerExtension = exports.requestQtIndex = exports.ROOT_QTIFW_URL = void 0;
 const core = __importStar(__webpack_require__(2186));
 const url = __importStar(__webpack_require__(8835));
 const semver = __importStar(__webpack_require__(1383));
@@ -122,7 +122,10 @@ function getInstallerLinkForSpecificVersion(requestedVersion, installerExtension
         if (installerLink == null) {
             throw `Couldn't locate specific installer for version '${requestedVersion}' and extension '${installerExtension}'`;
         }
-        return installerLink.replace('https:', 'http:');
+        console.log('Original installerLink=${installerLink}');
+        installerLink = yield getMirrorLinkForSpecificLink(installerLink);
+        core.info("Selected mirror '${installerLink)'");
+        return installerLink;
     });
 }
 exports.getInstallerLinkForSpecificVersion = getInstallerLinkForSpecificVersion;
@@ -149,7 +152,7 @@ function isUrlBlackListed(url) {
     ];
     return filterOutUrl(url, blacklisteds);
 }
-function getMirrorLinksForSpecificLink(originalUrl, alreadyTriedUrls) {
+function getMirrorLinkForSpecificLink(originalUrl, alreadyTriedUrls) {
     return __awaiter(this, void 0, void 0, function* () {
         const metaUrl = `${originalUrl}.meta4`;
         core.debug(`Trying to parse Meta4 file at ${metaUrl}`);
@@ -169,10 +172,10 @@ function getMirrorLinksForSpecificLink(originalUrl, alreadyTriedUrls) {
                 if (thisLink && thisPriority) {
                     // console.log(`${thisPriority}, ${thisLink}`);
                     if (isUrlBlackListed(thisLink)) {
-                        console.log(`${thisLink} is blacklisted`);
+                        core.debug(`${thisLink} is blacklisted`);
                     }
                     else if (filterOutUrl(thisLink, alreadyTriedUrls)) {
-                        console.log(`${thisLink} was already tried`);
+                        core.debug(`${thisLink} was already tried`);
                     }
                     else {
                         mirrors.push({
@@ -194,7 +197,7 @@ function getMirrorLinksForSpecificLink(originalUrl, alreadyTriedUrls) {
         return mirrors.sort((a, b) => a.priority - b.priority)[0].url;
     });
 }
-exports.getMirrorLinksForSpecificLink = getMirrorLinksForSpecificLink;
+exports.getMirrorLinkForSpecificLink = getMirrorLinkForSpecificLink;
 
 
 /***/ }),

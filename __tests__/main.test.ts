@@ -1,5 +1,7 @@
 import * as findQtIFW from '../src/find-qtifw';
 import * as installQtIFW from '../src/install-qtifw';
+import * as httpm from '@actions/http-client'
+import * as core from '@actions/core'
 
 import * as path from 'path';
 
@@ -40,7 +42,7 @@ test('getInstallerLinkForSpecificVersion', async () => {
     'run'
   );
   await expect(link).toEqual(
-    'http://download.qt.io/official_releases/qt-installer-framework/3.1.1/QtInstallerFramework-linux-x64.run'
+    expect.stringContaining('qt-installer-framework/3.1.1/QtInstallerFramework-linux-x64.run')
   );
 });
 
@@ -50,21 +52,21 @@ test('getInstallerLinkForSpecificVersion_2', async () => {
     'dmg'
   );
   await expect(link).toEqual(
-    'http://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-macOS-x86_64-4.1.1.dmg'
+    expect.stringContaining('qt-installer-framework/4.1.1/QtInstallerFramework-macOS-x86_64-4.1.1.dmg')
   );
 });
 
 
 test('Parse Meta Url', async () => {
   const originalUrl = 'https://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-linux-x64-4.1.1.run';
-  const link: string = await findQtIFW.getMirrorLinksForSpecificLink(
+  const link: string = await findQtIFW.getMirrorLinkForSpecificLink(
     originalUrl
   );
   await expect(link).toMatch(/\.run/);
   await expect(link).toEqual(expect.not.stringMatching('download.qt.io'));
 
   const alreadyTried = [link];
-  const link2: string = await findQtIFW.getMirrorLinksForSpecificLink(
+  const link2: string = await findQtIFW.getMirrorLinkForSpecificLink(
     originalUrl, alreadyTried
   );
 
@@ -72,3 +74,68 @@ test('Parse Meta Url', async () => {
   await expect(link2).toEqual(expect.not.stringMatching('download.qt.io'));
   await expect(link2).toEqual(expect.not.stringContaining(link));
 });
+
+test('Redirects test bed', async () => {
+
+  const url = 'https://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-linux-x64-4.1.1.run';
+
+  const userAgent = "IT'S ME!";
+
+  const connectionTimeout = 100;
+
+  // Get the response headers
+  const http = new httpm.HttpClient(userAgent, [], {
+    allowRetries: false,
+    allowRedirects: false,
+    allowRedirectDowngrade: false,
+    socketTimeout: connectionTimeout  // miliseconds
+  });
+
+  const response: httpm.HttpClientResponse = await http.get(url)
+  const statusCode = response.message.statusCode;
+  if (!statusCode) {
+    throw Error;
+  }
+  // Redirect
+  if (statusCode > 300 && statusCode < 309) {
+    const location = response.message.headers.location || '';
+    core.error(
+      `Asked to redirect ${statusCode} to ${location}`
+    )
+  } else {
+    core.error(
+      `Failed to download from "${url}". Code(${response.message.statusCode}) Message(${response.message.statusMessage})`
+    )
+  }
+});
+
+test('Try a fast and a slow mirror to figure out the connectionTimeOut', async () => {
+
+  const urlPath = 'official_releases/qt-installer-framework/4.1.1/installer-framework-opensource-src-4.1.1.tar.xz'
+  const fastUrl = `http://www.mirrorservice.org/sites/download.qt-project.org/${urlPath}`;
+  const slowUrl = 'https://mirrors.tuna.tsinghua.edu.cn/qt/${urlPath}';
+
+  const userAgent = "IT'S ME!";
+
+  const connectionTimeout = 200;
+
+  // Get the response headers
+  const http = new httpm.HttpClient(userAgent, [], {
+    allowRetries: false,
+    allowRedirects: false,
+    allowRedirectDowngrade: false,
+    socketTimeout: connectionTimeout  // miliseconds
+  });
+
+  await expect(await () => http.get(fastUrl))
+    .rejects
+    .not
+    .toThrow();
+
+  await expect(http.get(slowUrl))
+    .rejects
+    .toThrow();
+
+});
+
+

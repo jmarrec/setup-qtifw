@@ -94,7 +94,11 @@ export async function getInstallerLinkForSpecificVersion(
   if (installerLink == null) {
     throw `Couldn't locate specific installer for version '${requestedVersion}' and extension '${installerExtension}'`;
   }
-  return installerLink.replace('https:', 'http:');
+  console.log('Original installerLink=${installerLink}');
+  installerLink = await getMirrorLinkForSpecificLink(installerLink);
+  core.info("Selected mirror '${installerLink)'");
+
+  return installerLink;
 }
 
 interface IMirror {
@@ -137,7 +141,7 @@ function isUrlBlackListed(url: string): boolean {
 }
 
 
-export async function getMirrorLinksForSpecificLink(
+export async function getMirrorLinkForSpecificLink(
   originalUrl: string,
   alreadyTriedUrls?: string[],
 ): Promise<string> {
@@ -163,9 +167,9 @@ export async function getMirrorLinksForSpecificLink(
         if (thisLink && thisPriority) {
           // console.log(`${thisPriority}, ${thisLink}`);
           if (isUrlBlackListed(thisLink)) {
-            console.log(`${thisLink} is blacklisted`);
+            core.debug(`${thisLink} is blacklisted`);
           } else if (filterOutUrl(thisLink, alreadyTriedUrls)) {
-            console.log(`${thisLink} was already tried`);
+            core.debug(`${thisLink} was already tried`);
           } else {
             mirrors.push({
               priority: +thisPriority,
