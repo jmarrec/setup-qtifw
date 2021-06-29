@@ -80,6 +80,7 @@ test('Parse Meta Url', async () => {
   await expect(link2).toEqual(expect.not.stringContaining(link));
 });
 
+/*
 test('Redirects test bed', async () => {
   const url =
     'https://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-linux-x64-4.1.1.run';
@@ -202,3 +203,4 @@ test('Try a fast and a slow mirror with HEAD', async () => {
     );
   }
 });
+*/
