@@ -134,8 +134,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
     await fs.chmodSync(qtIFWPath, '755');
     // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
     platformOpts = '--platform minimal';
-    process.env['XDG_RUNTIME_DIR'] =
-      process.env['XDG_RUNTIME_DIR'] || '/tmp/runtime-runner';
+    process.env['XDG_RUNTIME_DIR'] = process.env['XDG_RUNTIME_DIR'] || '/tmp/';
   }
   core.debug('Will try to run the installer now');
   const installDir = path.join(workingDirectory, 'install');
