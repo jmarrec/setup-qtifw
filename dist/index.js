@@ -339,8 +339,11 @@ function runInstallQtIFW(qtIFWPath) {
             yield fs_1.default.chmodSync(qtIFWPath, '755');
             // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
             platformOpts = '--platform minimal';
-            process.env['XDG_RUNTIME_DIR'] =
-                process.env['XDG_RUNTIME_DIR'] || '/tmp/';
+            if (!process.env['XDG_RUNTIME_DIR']) {
+                const xdg_dir = path.join('/tmp/', uuid_1.v4());
+                fs_1.default.mkdirSync(xdg_dir, '0700');
+                process.env['XDG_RUNTIME_DIR'] = xdg_dir;
+            }
         }
         core.debug('Will try to run the installer now');
         const installDir = path.join(workingDirectory, 'install');
