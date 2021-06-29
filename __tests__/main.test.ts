@@ -147,3 +147,58 @@ test('Try a fast and a slow mirror to figure out the connectionTimeOut', async (
   }
   expect(message).toMatch(/timeout/i);
 });
+
+test('Try a fast and a slow mirror with HEAD', async () => {
+  const urlPath =
+    'official_releases/qt-installer-framework/4.1.1/installer-framework-opensource-src-4.1.1.tar.xz';
+  const fastUrl = `http://www.mirrorservice.org/sites/download.qt-project.org/${urlPath}`;
+  const slowUrl = 'https://mirrors.tuna.tsinghua.edu.cn/qt/${urlPath}';
+
+  const userAgent = "IT'S ME!";
+
+  const connectionTimeout = 500;
+
+  // Get the response headers
+  const http = new httpm.HttpClient(userAgent, [], {
+    allowRetries: false,
+    allowRedirects: false,
+    allowRedirectDowngrade: false,
+    socketTimeout: connectionTimeout // miliseconds
+  });
+
+  let message;
+  try {
+    const response = await http.head(fastUrl);
+    core.info(`${response.message.statusCode}, ${response.message.headers}`);
+  } catch (error) {
+    message = error.message;
+  }
+  expect(message).toBeUndefined();
+
+  //await expect(http.get(slowUrl)).rejects.toThrow();
+
+  try {
+    const response = await http.head(slowUrl);
+    core.info(`${response.message.statusCode}, ${response.message.headers}`);
+  } catch (error) {
+    message = error.message;
+  }
+  expect(message).toMatch(/timeout/i);
+
+  const url =
+    'https://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-linux-x64-4.1.1.run';
+  const response: httpm.HttpClientResponse = await http.head(url);
+  const statusCode = response.message.statusCode;
+  if (!statusCode) {
+    throw Error;
+  }
+  // Redirect
+  if (statusCode > 300 && statusCode < 309) {
+    const location = response.message.headers.location || '';
+    core.error(`HEAD: Asked to redirect ${statusCode} to ${location}`);
+  } else {
+    core.error(
+      `Failed to download from "${url}". Code(${response.message.statusCode}) Message(${response.message.statusMessage})`
+    );
+  }
+});

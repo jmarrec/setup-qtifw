@@ -94,7 +94,7 @@ export async function getInstallerLinkForSpecificVersion(
   if (installerLink == null) {
     throw `Couldn't locate specific installer for version '${requestedVersion}' and extension '${installerExtension}'`;
   }
-  console.log('Original installerLink=${installerLink}');
+  console.log(`Original installerLink=${installerLink}`);
   installerLink = await getMirrorLinkForSpecificLink(installerLink);
   core.info(`Selected mirror '${installerLink}'`);
 

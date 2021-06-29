@@ -122,7 +122,7 @@ function getInstallerLinkForSpecificVersion(requestedVersion, installerExtension
         if (installerLink == null) {
             throw `Couldn't locate specific installer for version '${requestedVersion}' and extension '${installerExtension}'`;
         }
-        console.log('Original installerLink=${installerLink}');
+        console.log(`Original installerLink=${installerLink}`);
         installerLink = yield getMirrorLinkForSpecificLink(installerLink);
         core.info(`Selected mirror '${installerLink}'`);
         return installerLink;
