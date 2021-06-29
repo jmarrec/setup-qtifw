@@ -96,3 +96,96 @@ export async function getInstallerLinkForSpecificVersion(
   }
   return installerLink.replace('https:', 'http:');
 }
+
+interface IMirror {
+    priority: number;
+    url: string;
+}
+
+function filterOutUrl(
+  url: string,
+  alreadyTriedUrls?: string[],
+): boolean {
+
+  if (alreadyTriedUrls === undefined) {
+    return false;
+  }
+
+  let isUrlBlackListed : boolean = false;
+
+  alreadyTriedUrls.forEach( (blacklisted) => {
+    // console.log(`url=${url}, blacklisted=${blacklisted}`);
+    if (url.toLowerCase().includes(blacklisted.toLowerCase())) {
+      isUrlBlackListed = true;
+      return;
+    }
+  });
+
+  return isUrlBlackListed;
+}
+
+function isUrlBlackListed(url: string): boolean {
+
+  const blacklisteds = [
+    "mirrors.ocf.berkeley.edu",
+    "mirrors.ustc.edu.cn",
+    "mirrors.tuna.tsinghua.edu.cn",
+    "mirrors.geekpie.club",
+  ];
+
+  return filterOutUrl(url, blacklisteds);
+}
+
+
+export async function getMirrorLinksForSpecificLink(
+  originalUrl: string,
+  alreadyTriedUrls?: string[],
+): Promise<string> {
+  const metaUrl = `${originalUrl}.meta4`;
+  core.debug(`Trying to parse Meta4 file at ${metaUrl}`);
+
+  let mirrors : IMirror[] = [];
+
+  await axios
+    .get(metaUrl)
+    .then((response: AxiosResponse) => {
+      const $ = cheerio.load(response.data, {
+        normalizeWhitespace: true,
+        xmlMode: true,
+      }); // Load the HTML string into cheerio
+
+      // const mirorrurls = $('urn\\:ietf\\:params\\:xml\\:ns\\:metalink\\:url[@priority]');
+      const mirorrurls = $('*url');
+
+      mirorrurls.each((i, elem) => {
+        const thisLink = $(elem).text();
+        const thisPriority = $(elem).attr('priority');
+        if (thisLink && thisPriority) {
+          // console.log(`${thisPriority}, ${thisLink}`);
+          if (isUrlBlackListed(thisLink)) {
+            console.log(`${thisLink} is blacklisted`);
+          } else if (filterOutUrl(thisLink, alreadyTriedUrls)) {
+            console.log(`${thisLink} was already tried`);
+          } else {
+            mirrors.push({
+              priority: +thisPriority,
+              url: thisLink,
+            });
+          }
+        }
+      });
+    })
+    .catch((error: AxiosError) => {
+      // handle error
+      console.log(error);
+      throw `Failed request to '${metaUrl}'`;
+    });
+
+  if (mirrors.length == 0) {
+    throw `Couldn't locate a single mirror on '${metaUrl}'`;
+  }
+
+  return mirrors.sort((a, b) => a.priority - b.priority)[0].url;
+}
+
+

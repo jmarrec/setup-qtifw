@@ -53,3 +53,22 @@ test('getInstallerLinkForSpecificVersion_2', async () => {
     'http://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-macOS-x86_64-4.1.1.dmg'
   );
 });
+
+
+test('Parse Meta Url', async () => {
+  const originalUrl = 'https://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-linux-x64-4.1.1.run';
+  const link: string = await findQtIFW.getMirrorLinksForSpecificLink(
+    originalUrl
+  );
+  await expect(link).toMatch(/\.run/);
+  await expect(link).toEqual(expect.not.stringMatching('download.qt.io'));
+
+  const alreadyTried = [link];
+  const link2: string = await findQtIFW.getMirrorLinksForSpecificLink(
+    originalUrl, alreadyTried
+  );
+
+  await expect(link2).toMatch(/\.run/);
+  await expect(link2).toEqual(expect.not.stringMatching('download.qt.io'));
+  await expect(link2).toEqual(expect.not.stringContaining(link));
+});

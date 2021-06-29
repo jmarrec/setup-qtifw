@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getInstallerLinkForSpecificVersion = exports.getInstallerExtension = exports.requestQtIndex = exports.ROOT_QTIFW_URL = void 0;
+exports.getMirrorLinksForSpecificLink = exports.getInstallerLinkForSpecificVersion = exports.getInstallerExtension = exports.requestQtIndex = exports.ROOT_QTIFW_URL = void 0;
 const core = __importStar(__webpack_require__(2186));
 const url = __importStar(__webpack_require__(8835));
 const semver = __importStar(__webpack_require__(1383));
@@ -126,6 +126,75 @@ function getInstallerLinkForSpecificVersion(requestedVersion, installerExtension
     });
 }
 exports.getInstallerLinkForSpecificVersion = getInstallerLinkForSpecificVersion;
+function filterOutUrl(url, alreadyTriedUrls) {
+    if (alreadyTriedUrls === undefined) {
+        return false;
+    }
+    let isUrlBlackListed = false;
+    alreadyTriedUrls.forEach((blacklisted) => {
+        // console.log(`url=${url}, blacklisted=${blacklisted}`);
+        if (url.toLowerCase().includes(blacklisted.toLowerCase())) {
+            isUrlBlackListed = true;
+            return;
+        }
+    });
+    return isUrlBlackListed;
+}
+function isUrlBlackListed(url) {
+    const blacklisteds = [
+        "mirrors.ocf.berkeley.edu",
+        "mirrors.ustc.edu.cn",
+        "mirrors.tuna.tsinghua.edu.cn",
+        "mirrors.geekpie.club",
+    ];
+    return filterOutUrl(url, blacklisteds);
+}
+function getMirrorLinksForSpecificLink(originalUrl, alreadyTriedUrls) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const metaUrl = `${originalUrl}.meta4`;
+        core.debug(`Trying to parse Meta4 file at ${metaUrl}`);
+        let mirrors = [];
+        yield axios_1.default
+            .get(metaUrl)
+            .then((response) => {
+            const $ = cheerio_1.default.load(response.data, {
+                normalizeWhitespace: true,
+                xmlMode: true,
+            }); // Load the HTML string into cheerio
+            // const mirorrurls = $('urn\\:ietf\\:params\\:xml\\:ns\\:metalink\\:url[@priority]');
+            const mirorrurls = $('*url');
+            mirorrurls.each((i, elem) => {
+                const thisLink = $(elem).text();
+                const thisPriority = $(elem).attr('priority');
+                if (thisLink && thisPriority) {
+                    // console.log(`${thisPriority}, ${thisLink}`);
+                    if (isUrlBlackListed(thisLink)) {
+                        console.log(`${thisLink} is blacklisted`);
+                    }
+                    else if (filterOutUrl(thisLink, alreadyTriedUrls)) {
+                        console.log(`${thisLink} was already tried`);
+                    }
+                    else {
+                        mirrors.push({
+                            priority: +thisPriority,
+                            url: thisLink,
+                        });
+                    }
+                }
+            });
+        })
+            .catch((error) => {
+            // handle error
+            console.log(error);
+            throw `Failed request to '${metaUrl}'`;
+        });
+        if (mirrors.length == 0) {
+            throw `Couldn't locate a single mirror on '${metaUrl}'`;
+        }
+        return mirrors.sort((a, b) => a.priority - b.priority)[0].url;
+    });
+}
+exports.getMirrorLinksForSpecificLink = getMirrorLinksForSpecificLink;
 
 
 /***/ }),
