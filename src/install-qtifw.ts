@@ -127,13 +127,15 @@ async function runInstallQtIFW(qtIFWPath: string) {
       '.dmg',
       '.app'
     )}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
-    platformOpts = '--platform minimal';
+    // Not supported on macOS: platformOpts = '--platform minimal';
   } else if (IS_LINUX) {
     // Chmod +x the .run file
     core.info('Chmod +x');
     await fs.chmodSync(qtIFWPath, '755');
     // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
     platformOpts = '--platform minimal';
+    process.env['XDG_RUNTIME_DIR'] =
+      process.env['XDG_RUNTIME_DIR'] || '/tmp/runtime-runner';
   }
   core.debug('Will try to run the installer now');
   const installDir = path.join(workingDirectory, 'install');

@@ -331,7 +331,7 @@ function runInstallQtIFW(qtIFWPath) {
             ], options);
             qtIFWPath = path.join(workingDirectory, `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/`);
             exeName = `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
-            platformOpts = '--platform minimal';
+            // Not supported on macOS: platformOpts = '--platform minimal';
         }
         else if (utils_1.IS_LINUX) {
             // Chmod +x the .run file
@@ -339,6 +339,7 @@ function runInstallQtIFW(qtIFWPath) {
             yield fs_1.default.chmodSync(qtIFWPath, '755');
             // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
             platformOpts = '--platform minimal';
+            process.env['XDG_RUNTIME_DIR'] = process.env['XDG_RUNTIME_DIR'] || '/tmp/runtime-runner';
         }
         core.debug('Will try to run the installer now');
         const installDir = path.join(workingDirectory, 'install');
@@ -379,7 +380,7 @@ function installRequiredSystemDeps() {
                     'install',
                     'libxkbcommon-x11-0',
                     'xorg-dev',
-                    'libglu1-mesa-dev',
+                    'libglu1-mesa-dev' // libglu1-mesa-dev freeglut3-dev mesa-common-dev
                 ], { silent: true });
             }
         }
