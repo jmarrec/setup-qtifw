@@ -9,7 +9,7 @@
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
-    "test": "jest --coverage --testPathPattern=main",
+    "test": "jest --coverage --testPathPattern=main --detectOpenHandles",
     "test-integration": "jest --testPathPattern=integration",
     "test-all": "jest --coverage",
     "all": "npm run build && npm run format && npm run package && npm test"

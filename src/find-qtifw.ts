@@ -96,28 +96,24 @@ export async function getInstallerLinkForSpecificVersion(
   }
   console.log('Original installerLink=${installerLink}');
   installerLink = await getMirrorLinkForSpecificLink(installerLink);
-  core.info("Selected mirror '${installerLink)'");
+  core.info(`Selected mirror '${installerLink}'`);
 
   return installerLink;
 }
 
 interface IMirror {
-    priority: number;
-    url: string;
+  priority: number;
+  url: string;
 }
 
-function filterOutUrl(
-  url: string,
-  alreadyTriedUrls?: string[],
-): boolean {
-
+function filterOutUrl(url: string, alreadyTriedUrls?: string[]): boolean {
   if (alreadyTriedUrls === undefined) {
     return false;
   }
 
-  let isUrlBlackListed : boolean = false;
+  let isUrlBlackListed: boolean = false;
 
-  alreadyTriedUrls.forEach( (blacklisted) => {
+  alreadyTriedUrls.forEach(blacklisted => {
     // console.log(`url=${url}, blacklisted=${blacklisted}`);
     if (url.toLowerCase().includes(blacklisted.toLowerCase())) {
       isUrlBlackListed = true;
@@ -129,33 +125,31 @@ function filterOutUrl(
 }
 
 function isUrlBlackListed(url: string): boolean {
-
   const blacklisteds = [
-    "mirrors.ocf.berkeley.edu",
-    "mirrors.ustc.edu.cn",
-    "mirrors.tuna.tsinghua.edu.cn",
-    "mirrors.geekpie.club",
+    'mirrors.ocf.berkeley.edu',
+    'mirrors.ustc.edu.cn',
+    'mirrors.tuna.tsinghua.edu.cn',
+    'mirrors.geekpie.club'
   ];
 
   return filterOutUrl(url, blacklisteds);
 }
 
-
 export async function getMirrorLinkForSpecificLink(
   originalUrl: string,
-  alreadyTriedUrls?: string[],
+  alreadyTriedUrls?: string[]
 ): Promise<string> {
   const metaUrl = `${originalUrl}.meta4`;
   core.debug(`Trying to parse Meta4 file at ${metaUrl}`);
 
-  let mirrors : IMirror[] = [];
+  let mirrors: IMirror[] = [];
 
   await axios
     .get(metaUrl)
     .then((response: AxiosResponse) => {
       const $ = cheerio.load(response.data, {
         normalizeWhitespace: true,
-        xmlMode: true,
+        xmlMode: true
       }); // Load the HTML string into cheerio
 
       // const mirorrurls = $('urn\\:ietf\\:params\\:xml\\:ns\\:metalink\\:url[@priority]');
@@ -173,7 +167,7 @@ export async function getMirrorLinkForSpecificLink(
           } else {
             mirrors.push({
               priority: +thisPriority,
-              url: thisLink,
+              url: thisLink
             });
           }
         }
@@ -191,5 +185,3 @@ export async function getMirrorLinkForSpecificLink(
 
   return mirrors.sort((a, b) => a.priority - b.priority)[0].url;
 }
-
-

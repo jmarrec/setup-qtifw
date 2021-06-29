@@ -124,7 +124,7 @@ function getInstallerLinkForSpecificVersion(requestedVersion, installerExtension
         }
         console.log('Original installerLink=${installerLink}');
         installerLink = yield getMirrorLinkForSpecificLink(installerLink);
-        core.info("Selected mirror '${installerLink)'");
+        core.info(`Selected mirror '${installerLink}'`);
         return installerLink;
     });
 }
@@ -134,7 +134,7 @@ function filterOutUrl(url, alreadyTriedUrls) {
         return false;
     }
     let isUrlBlackListed = false;
-    alreadyTriedUrls.forEach((blacklisted) => {
+    alreadyTriedUrls.forEach(blacklisted => {
         // console.log(`url=${url}, blacklisted=${blacklisted}`);
         if (url.toLowerCase().includes(blacklisted.toLowerCase())) {
             isUrlBlackListed = true;
@@ -145,10 +145,10 @@ function filterOutUrl(url, alreadyTriedUrls) {
 }
 function isUrlBlackListed(url) {
     const blacklisteds = [
-        "mirrors.ocf.berkeley.edu",
-        "mirrors.ustc.edu.cn",
-        "mirrors.tuna.tsinghua.edu.cn",
-        "mirrors.geekpie.club",
+        'mirrors.ocf.berkeley.edu',
+        'mirrors.ustc.edu.cn',
+        'mirrors.tuna.tsinghua.edu.cn',
+        'mirrors.geekpie.club'
     ];
     return filterOutUrl(url, blacklisteds);
 }
@@ -162,7 +162,7 @@ function getMirrorLinkForSpecificLink(originalUrl, alreadyTriedUrls) {
             .then((response) => {
             const $ = cheerio_1.default.load(response.data, {
                 normalizeWhitespace: true,
-                xmlMode: true,
+                xmlMode: true
             }); // Load the HTML string into cheerio
             // const mirorrurls = $('urn\\:ietf\\:params\\:xml\\:ns\\:metalink\\:url[@priority]');
             const mirorrurls = $('*url');
@@ -180,7 +180,7 @@ function getMirrorLinkForSpecificLink(originalUrl, alreadyTriedUrls) {
                     else {
                         mirrors.push({
                             priority: +thisPriority,
-                            url: thisLink,
+                            url: thisLink
                         });
                     }
                 }
