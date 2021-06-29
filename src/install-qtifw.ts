@@ -83,8 +83,8 @@ async function runInstallQtIFW(qtIFWPath: string) {
 
   if (IS_DARWIN) {
     // This is very annoying... but we need to mount the DMG first...
-    // hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-mac-x64.dmg
-    // sudo ./qtfiw_installer/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64 --verbose --script ./ci/install_script_qtifw.qs
+    // hdiutil attach -mountpoint ./qtifw_installer QtInstallerFramework-mac-x64.dmg
+    // sudo ./qtifw_installer/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64 --verbose --script ./ci/install_script_qtifw.qs
 
     await exec.exec(
       'bash',
@@ -94,14 +94,14 @@ async function runInstallQtIFW(qtIFWPath: string) {
         '-eo',
         'pipefail',
         '-c',
-        `hdiutil attach -mountpoint ./qtfiw_installer "${qtIFWPath}"`
+        `hdiutil attach -mountpoint ./qtifw_installer "${qtIFWPath}"`
       ],
       options
     );
-    core.debug('ls ./qtfiw_installer/');
-    await exec.exec('bash', ['-c', 'ls ./qtfiw_installer/'], options);
+    core.debug('ls ./qtifw_installer/');
+    await exec.exec('bash', ['-c', 'ls ./qtifw_installer/'], options);
     core.debug(
-      `ls ./qtfiw_installer/${exeName.replace(
+      `ls ./qtifw_installer/${exeName.replace(
         '.dmg',
         '.app'
       )}/Contents/MacOS/${exeName.replace('.dmg', '')}/`
@@ -110,7 +110,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
       'bash',
       [
         '-c',
-        `ls ./qtfiw_installer/${exeName.replace(
+        `ls ./qtifw_installer/${exeName.replace(
           '.dmg',
           '.app'
         )}/Contents/MacOS/`
@@ -120,10 +120,10 @@ async function runInstallQtIFW(qtIFWPath: string) {
 
     qtIFWPath = path.join(
       workingDirectory,
-      `qtfiw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/`
+      `qtifw_installer/${exeName.replace('.dmg', '.app')}/Contents/MacOS/`
     );
 
-    exeName = `qtfiw_installer/${exeName.replace(
+    exeName = `qtifw_installer/${exeName.replace(
       '.dmg',
       '.app'
     )}/Contents/MacOS/${exeName.replace('.dmg', '')}`;
@@ -131,7 +131,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
   } else if (IS_LINUX) {
     // Chmod +x the .run file
     core.info('Chmod +x');
-    await fs.chmodSync(qtIFWPath, '755');
+    fs.chmodSync(qtIFWPath, '0755');
     // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
     platformOpts = '--platform minimal';
     if (!process.env['XDG_RUNTIME_DIR']) {
