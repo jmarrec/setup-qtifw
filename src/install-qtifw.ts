@@ -191,7 +191,7 @@ export async function installRequiredSystemDeps() {
           'install',
           'libxkbcommon-x11-0',
           'xorg-dev',
-          'libglu1-mesa-dev' // libglu1-mesa-dev freeglut3-dev mesa-common-dev
+          'libgl1-mesa-dev'
         ],
         {silent: false}
       );
