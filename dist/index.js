@@ -377,7 +377,7 @@ function installRequiredSystemDeps() {
         if (process.env['GITHUB_ACTIONS']) {
             if (utils_1.IS_LINUX) {
                 core.info('Running apt-get update');
-                yield exec.exec('sudo', ['apt-get', 'update']);
+                yield exec.exec('sudo', ['apt-get', 'update'], { silent: true });
                 core.info('Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev');
                 yield exec.exec('sudo', [
                     'apt-get',
@@ -386,7 +386,7 @@ function installRequiredSystemDeps() {
                     'libxkbcommon-x11-0',
                     'xorg-dev',
                     'libgl1-mesa-dev'
-                ], { silent: false });
+                ], { silent: true });
             }
         }
     });
