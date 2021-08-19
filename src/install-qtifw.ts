@@ -187,13 +187,13 @@ export async function installRequiredSystemDeps() {
         'sudo',
         [
           'apt-get',
-          '-yqq',
+          '-y',
           'install',
           'libxkbcommon-x11-0',
           'xorg-dev',
           'libglu1-mesa-dev' // libglu1-mesa-dev freeglut3-dev mesa-common-dev
         ],
-        {silent: true}
+        {silent: false}
       );
     }
   }

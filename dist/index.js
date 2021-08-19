@@ -380,12 +380,12 @@ function installRequiredSystemDeps() {
                 core.info('Installing required system library: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev');
                 yield exec.exec('sudo', [
                     'apt-get',
-                    '-yqq',
+                    '-y',
                     'install',
                     'libxkbcommon-x11-0',
                     'xorg-dev',
                     'libglu1-mesa-dev' // libglu1-mesa-dev freeglut3-dev mesa-common-dev
-                ], { silent: true });
+                ], { silent: false });
             }
         }
     });
