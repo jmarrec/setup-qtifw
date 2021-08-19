@@ -376,8 +376,9 @@ function installRequiredSystemDeps() {
     return __awaiter(this, void 0, void 0, function* () {
         if (process.env['GITHUB_ACTIONS']) {
             if (utils_1.IS_LINUX) {
-                // libxkbcommon-x11-0
-                core.info('Installing required system library: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev');
+                core.info('Running apt-get update');
+                yield exec.exec('sudo', ['apt-get', 'update']);
+                core.info('Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev');
                 yield exec.exec('sudo', [
                     'apt-get',
                     '-y',

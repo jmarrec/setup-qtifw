@@ -179,10 +179,15 @@ async function runInstallQtIFW(qtIFWPath: string) {
 export async function installRequiredSystemDeps() {
   if (process.env['GITHUB_ACTIONS']) {
     if (IS_LINUX) {
-      // libxkbcommon-x11-0
       core.info(
-        'Installing required system library: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev'
+        'Running apt-get update'
       );
+      await exec.exec('sudo', ['apt-get', 'update' ]);
+
+      core.info(
+        'Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev'
+      );
+
       await exec.exec(
         'sudo',
         [
