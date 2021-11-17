@@ -29,7 +29,7 @@ async function run(): Promise<void> {
 
     core.info('Launching install');
     await installQtIFW.installQtIFW(installerLink);
-  } catch (err) {
+  } catch (err: any) {
     core.setFailed(err.message);
   }
 }

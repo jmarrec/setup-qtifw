@@ -38,7 +38,7 @@ export async function installQtIFW(downloadUrl: string) {
   } else {
     try {
       qtIFWPath = await tc.downloadTool(downloadUrl, qtIFWPathDest);
-    } catch (error) {
+    } catch (error: any) {
       core.warning(
         `Initial download failed '${downloadUrl}' with error: ${error.message}`
       );
@@ -54,7 +54,7 @@ export async function installQtIFW(downloadUrl: string) {
   core.info(`Execute installer at ${qtIFWPath}`);
   try {
     await runInstallQtIFW(qtIFWPath);
-  } catch (error) {
+  } catch (error: any) {
     core.error(`ERROR: ${error.message}`);
   }
 }
@@ -177,8 +177,8 @@ async function runInstallQtIFW(qtIFWPath: string) {
     if (return_code != 0) {
       throw 'Something went wrong during the installation';
     }
-  } catch (error) {
-    throw 'Something went wrong during the installation' + error.message;
+  } catch (error: any) {
+    throw `Something went wrong during the installation: ${error.message}`;
   }
 
   const binDir = path.join(installDir, 'bin/');
