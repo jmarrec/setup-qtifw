@@ -20,7 +20,7 @@ export async function requestQtIndex(
     })
     .catch((error: AxiosError) => {
       // handle error
-      console.log(error);
+      core.error(error);
       throw `Failed request to '${ROOT_QTIFW_URL}'`;
     });
 
@@ -87,16 +87,14 @@ export async function getInstallerLinkForSpecificVersion(
     })
     .catch((error: AxiosError) => {
       // handle error
-      console.log(error);
+      core.error(error);
       throw `Failed request to '${qtPageUrl}'`;
     });
 
   if (installerLink == null) {
     throw `Couldn't locate specific installer for version '${requestedVersion}' and extension '${installerExtension}'`;
   }
-  console.log(`Original installerLink=${installerLink}`);
-  installerLink = await getMirrorLinkForSpecificLink(installerLink);
-  core.info(`Selected mirror '${installerLink}'`);
+  core.info(`Original installerLink=${installerLink}`);
 
   return installerLink;
 }
@@ -114,7 +112,7 @@ function filterOutUrl(url: string, alreadyTriedUrls?: string[]): boolean {
   let isUrlBlackListed: boolean = false;
 
   alreadyTriedUrls.forEach(blacklisted => {
-    // console.log(`url=${url}, blacklisted=${blacklisted}`);
+    core.debug(`url=${url}, blacklisted=${blacklisted}`);
     if (url.toLowerCase().includes(blacklisted.toLowerCase())) {
       isUrlBlackListed = true;
       return;
@@ -159,7 +157,7 @@ export async function getMirrorLinkForSpecificLink(
         const thisLink = $(elem).text();
         const thisPriority = $(elem).attr('priority');
         if (thisLink && thisPriority) {
-          // console.log(`${thisPriority}, ${thisLink}`);
+          core.debug(`${thisPriority}, ${thisLink}`);
           if (isUrlBlackListed(thisLink)) {
             core.debug(`${thisLink} is blacklisted`);
           } else if (filterOutUrl(thisLink, alreadyTriedUrls)) {
@@ -175,7 +173,7 @@ export async function getMirrorLinkForSpecificLink(
     })
     .catch((error: AxiosError) => {
       // handle error
-      console.log(error);
+      core.error(error);
       throw `Failed request to '${metaUrl}'`;
     });
 

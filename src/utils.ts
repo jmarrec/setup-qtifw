@@ -7,7 +7,7 @@ export const IS_LINUX = process.platform === 'linux';
 
 export function deleteFolderRecursive(directoryPath: string) {
   if (fs.existsSync(directoryPath)) {
-    // console.log(`Wipping directory ${directoryPath}`);
+    // core.info(`Wipping directory ${directoryPath}`);
     fs.readdirSync(directoryPath).forEach((file, index) => {
       const curPath = path.join(directoryPath, file);
       if (fs.lstatSync(curPath).isDirectory()) {

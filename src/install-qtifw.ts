@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import * as exec from '@actions/exec';
+import {getMirrorLinkForSpecificLink} from './find-qtifw';
 import {v4 as uuidV4} from 'uuid';
 import {ExecOptions} from '@actions/exec/lib/interfaces';
 
@@ -35,7 +36,17 @@ export async function installQtIFW(downloadUrl: string) {
     core.info(`File already exists at ${qtIFWPathDest}`);
     qtIFWPath = qtIFWPathDest;
   } else {
-    qtIFWPath = await tc.downloadTool(downloadUrl, qtIFWPathDest);
+    try {
+      qtIFWPath = await tc.downloadTool(downloadUrl, qtIFWPathDest);
+    } catch (error) {
+      core.warning(
+        `Initial download failed '${downloadUrl}' with error: ${error.message}`
+      );
+      downloadUrl = await getMirrorLinkForSpecificLink(downloadUrl);
+      core.info(`Selected mirror '${downloadUrl}'`);
+      qtIFWPath = await tc.downloadTool(downloadUrl, qtIFWPathDest);
+    }
+
     core.info(`Downloaded installer at "${qtIFWPath}"`);
   }
   core.debug(`qtIFWPathDest=${qtIFWPathDest}`);
@@ -44,7 +55,7 @@ export async function installQtIFW(downloadUrl: string) {
   try {
     await runInstallQtIFW(qtIFWPath);
   } catch (error) {
-    console.log('ERROR', error.message);
+    core.error(`ERROR: ${error.message}`);
   }
 }
 

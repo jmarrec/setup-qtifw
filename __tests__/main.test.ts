@@ -60,6 +60,9 @@ test('getInstallerLinkForSpecificVersion_2', async () => {
   );
 });
 
+// TODO: As of 2021-11-17, the .meta4 file appears to no longer be a simple
+// metalink XML file. Rather, it ends up being the size of the package...
+/*
 test('Parse Meta Url', async () => {
   const originalUrl =
     'https://download.qt.io/official_releases/qt-installer-framework/4.1.1/QtInstallerFramework-linux-x64-4.1.1.run';
@@ -79,6 +82,7 @@ test('Parse Meta Url', async () => {
   await expect(link2).toEqual(expect.not.stringMatching('download.qt.io'));
   await expect(link2).toEqual(expect.not.stringContaining(link));
 });
+*/
 
 /*
 test('Redirects test bed', async () => {
