@@ -37,7 +37,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/cheerio": "^0.22.29",
+    "@types/cheerio": "^0.22.30",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.7",
     "@types/semver": "^7.3.6",
