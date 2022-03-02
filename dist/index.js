@@ -391,7 +391,8 @@ function installRequiredSystemDeps() {
                     'install',
                     'libxkbcommon-x11-0',
                     'xorg-dev',
-                    'libgl1-mesa-dev'
+                    'libgl1-mesa-dev',
+                    'libxcb-icccm4',
                 ], { silent: true });
             }
         }
