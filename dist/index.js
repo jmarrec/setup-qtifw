@@ -384,7 +384,7 @@ function installRequiredSystemDeps() {
             if (utils_1.IS_LINUX) {
                 core.info('Running apt-get update');
                 yield exec.exec('sudo', ['apt-get', 'update'], { silent: true });
-                core.info('Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev');
+                core.info('Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev libxcb-icccm4 libxcb-image');
                 yield exec.exec('sudo', [
                     'apt-get',
                     '-y',
@@ -393,6 +393,7 @@ function installRequiredSystemDeps() {
                     'xorg-dev',
                     'libgl1-mesa-dev',
                     'libxcb-icccm4',
+                    'libxcb-image'
                 ], { silent: true });
             }
         }

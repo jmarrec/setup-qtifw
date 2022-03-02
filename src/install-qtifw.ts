@@ -194,7 +194,7 @@ export async function installRequiredSystemDeps() {
       await exec.exec('sudo', ['apt-get', 'update'], {silent: true});
 
       core.info(
-        'Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev'
+        'Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev libxcb-icccm4 libxcb-image'
       );
 
       await exec.exec(
@@ -206,7 +206,8 @@ export async function installRequiredSystemDeps() {
           'libxkbcommon-x11-0',
           'xorg-dev',
           'libgl1-mesa-dev',
-          'libxcb-icccm4'
+          'libxcb-icccm4',
+          'libxcb-image'
         ],
         {silent: true}
       );
