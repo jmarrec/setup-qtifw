@@ -384,7 +384,7 @@ function installRequiredSystemDeps() {
             if (utils_1.IS_LINUX) {
                 core.info('Running apt-get update');
                 yield exec.exec('sudo', ['apt-get', 'update'], { silent: true });
-                core.info('Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-xinerama0-dev libxcb-randr0-dev');
+                core.info('Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-xinerama0-dev libxcb-randr0-dev libxcb-shape0');
                 yield exec.exec('sudo', [
                     'apt-get',
                     '-y',
@@ -397,7 +397,8 @@ function installRequiredSystemDeps() {
                     'libxcb-keysyms1-dev',
                     'libxcb-render-util0-dev',
                     'libxcb-xinerama0-dev',
-                    'libxcb-randr0-dev'
+                    'libxcb-randr0-dev',
+                    'libxcb-shape0'
                 ], { silent: true });
             }
         }

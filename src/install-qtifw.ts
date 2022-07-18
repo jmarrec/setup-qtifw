@@ -194,7 +194,7 @@ export async function installRequiredSystemDeps() {
       await exec.exec('sudo', ['apt-get', 'update'], {silent: true});
 
       core.info(
-        'Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-xinerama0-dev libxcb-randr0-dev'
+        'Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-xinerama0-dev libxcb-randr0-dev libxcb-shape0'
       );
 
       await exec.exec(
@@ -211,7 +211,8 @@ export async function installRequiredSystemDeps() {
           'libxcb-keysyms1-dev',
           'libxcb-render-util0-dev',
           'libxcb-xinerama0-dev',
-          'libxcb-randr0-dev'
+          'libxcb-randr0-dev',
+          'libxcb-shape0'
         ],
         {silent: true}
       );
