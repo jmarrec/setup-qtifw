@@ -4,6 +4,11 @@ import * as path from 'path';
 export const IS_WINDOWS = process.platform === 'win32';
 export const IS_DARWIN = process.platform === 'darwin';
 export const IS_LINUX = process.platform === 'linux';
+export const PLATFORM_WINDOWS = 'win32';
+export const PLATFORM_DARWIN = 'darwin';
+export const PLATFORM_LINUX = 'linux';
+export const PLATFORM = process.platform;
+export const ARCH = process.arch;
 
 export function deleteFolderRecursive(directoryPath: string) {
   if (fs.existsSync(directoryPath)) {

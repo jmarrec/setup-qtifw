@@ -5,7 +5,12 @@ import axios, {AxiosResponse, AxiosError} from 'axios';
 import cheerio from 'cheerio';
 // import {AxiosResponse, AxiosError} from 'axios'
 
-import {IS_WINDOWS, IS_DARWIN, IS_LINUX} from './utils';
+import {
+  PLATFORM,
+  PLATFORM_WINDOWS,
+  PLATFORM_DARWIN,
+  PLATFORM_LINUX
+} from './utils';
 
 export const ROOT_QTIFW_URL =
   'https://download.qt.io/official_releases/qt-installer-framework/';
@@ -51,26 +56,31 @@ function parseQtIndex(html: string) {
   return versions;
 }
 
-export function getInstallerExtension(): string {
+export function getInstallerExtension(platform: string): string {
   let ext = '';
-  if (IS_WINDOWS) {
+  if (platform === PLATFORM_WINDOWS) {
     ext = 'exe';
-  } else if (IS_DARWIN) {
+  } else if (platform === PLATFORM_DARWIN) {
     ext = 'dmg';
-  } else if (IS_LINUX) {
+  } else if (platform === PLATFORM_LINUX) {
     ext = 'run';
+  } else {
+    throw `Unknown platform '${platform}'`;
   }
   return ext;
 }
 
 export async function getInstallerLinkForSpecificVersion(
   requestedVersion: string,
-  installerExtension: string
+  installerExtension: string,
+  arch: string
 ): Promise<string> {
   const qtPageUrl = `${url.resolve(ROOT_QTIFW_URL, requestedVersion)}/`;
   core.debug(`Trying to parse ${qtPageUrl}`);
 
   let installerLink = '';
+
+  const linux_has_arm64: boolean = semver.gte(requestedVersion, '4.7.0');
 
   await axios
     .get(qtPageUrl)
@@ -80,7 +90,13 @@ export async function getInstallerLinkForSpecificVersion(
 
       versionTable.each((i, elem) => {
         const thisLink = $(elem).attr('href');
-        if (thisLink && thisLink.endsWith(installerExtension)) {
+        if (
+          thisLink &&
+          thisLink.endsWith(installerExtension) &&
+          (installerExtension != 'run' ||
+            !linux_has_arm64 ||
+            thisLink.includes(arch))
+        ) {
           installerLink = url.resolve(qtPageUrl, thisLink);
         }
       });

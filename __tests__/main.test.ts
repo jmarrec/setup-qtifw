@@ -1,5 +1,7 @@
 import * as findQtIFW from '../src/find-qtifw';
 import * as installQtIFW from '../src/install-qtifw';
+import {IS_WINDOWS, IS_DARWIN, IS_LINUX, ARCH} from '../src/utils';
+
 import * as httpm from '@actions/http-client';
 import * as core from '@actions/core';
 
@@ -12,18 +14,18 @@ test('Split a path', () => {
 });
 
 test('A Major is found', async () => {
-  const qtifwindex: string = await findQtIFW.requestQtIndex('3.x');
-  await expect(qtifwindex).toEqual('3.2.2');
+  const qtifwindex: string = await findQtIFW.requestQtIndex('4.x');
+  await expect(qtifwindex).toEqual('4.7.0');
 });
 
 test('A major.minor is found', async () => {
-  const qtifwindex: string = await findQtIFW.requestQtIndex('3.1');
-  await expect(qtifwindex).toEqual('3.1.1');
+  const qtifwindex: string = await findQtIFW.requestQtIndex('4.6');
+  await expect(qtifwindex).toEqual('4.6.1');
 });
 
 test('A major.minor.patch is found', async () => {
-  const qtifwindex: string = await findQtIFW.requestQtIndex('3.1.1');
-  await expect(qtifwindex).toEqual('3.1.1');
+  const qtifwindex: string = await findQtIFW.requestQtIndex('4.7.0');
+  await expect(qtifwindex).toEqual('4.7.0');
 });
 
 it('should test async errors', async () => {
@@ -33,29 +35,70 @@ it('should test async errors', async () => {
 });
 
 test('getInstallerExtension', () => {
-  expect(findQtIFW.getInstallerExtension()).toEqual('run');
+  expect(findQtIFW.getInstallerExtension('linux')).toEqual('run');
 });
 
-test('getInstallerLinkForSpecificVersion', async () => {
+test('getInstallerLinkForSpecificVersion_linux_x64_pre470', async () => {
   const link: string = await findQtIFW.getInstallerLinkForSpecificVersion(
-    '3.1.1',
-    'run'
+    '4.6.1',
+    'run',
+    'x64'
   );
   await expect(link).toEqual(
     expect.stringContaining(
-      'qt-installer-framework/3.1.1/QtInstallerFramework-linux-x64.run'
+      'qt-installer-framework/4.6.1/QtInstallerFramework-linux-x64-4.6.1.run'
     )
   );
 });
 
-test('getInstallerLinkForSpecificVersion_2', async () => {
+test('getInstallerLinkForSpecificVersion_linux_arm64_pre470', async () => {
   const link: string = await findQtIFW.getInstallerLinkForSpecificVersion(
-    '4.1.1',
-    'dmg'
+    '4.6.1',
+    'run',
+    'arm'
   );
   await expect(link).toEqual(
     expect.stringContaining(
-      'qt-installer-framework/4.1.1/QtInstallerFramework-macOS-x86_64-4.1.1.dmg'
+      'qt-installer-framework/4.6.1/QtInstallerFramework-linux-x64-4.6.1.run'
+    )
+  );
+});
+
+test('getInstallerLinkForSpecificVersion_linux_x64_post470', async () => {
+  const link: string = await findQtIFW.getInstallerLinkForSpecificVersion(
+    '4.7.0',
+    'run',
+    'x64'
+  );
+  await expect(link).toEqual(
+    expect.stringContaining(
+      'qt-installer-framework/4.7.0/QtInstallerFramework-linux-x64-4.7.0.run'
+    )
+  );
+});
+
+test('getInstallerLinkForSpecificVersion_linux_arm64_post470', async () => {
+  const link: string = await findQtIFW.getInstallerLinkForSpecificVersion(
+    '4.7.0',
+    'run',
+    'arm'
+  );
+  await expect(link).toEqual(
+    expect.stringContaining(
+      'qt-installer-framework/4.7.0/QtInstallerFramework-linux-arm64-4.7.0.run'
+    )
+  );
+});
+
+test('getInstallerLinkForSpecificVersion_mac_arm64', async () => {
+  const link: string = await findQtIFW.getInstallerLinkForSpecificVersion(
+    '4.7.0',
+    'dmg',
+    'arm'
+  );
+  await expect(link).toEqual(
+    expect.stringContaining(
+      'qt-installer-framework/4.7.0/QtInstallerFramework-macOS-x64-4.7.0.dmg'
     )
   );
 });

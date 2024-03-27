@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as findQtIFW from './find-qtifw';
 import * as installQtIFW from './install-qtifw';
+import {ARCH, PLATFORM} from './utils';
 
 async function run(): Promise<void> {
   try {
@@ -13,13 +14,14 @@ async function run(): Promise<void> {
 
     core.info(`QtIFW Version Selected: ${qtIfwVersion}`);
 
-    const installerExtension = findQtIFW.getInstallerExtension();
+    const installerExtension = findQtIFW.getInstallerExtension(PLATFORM);
     core.debug(
       `Will look for ${qtIfwVersion} with extension '${installerExtension}'`
     );
     const installerLink = await findQtIFW.getInstallerLinkForSpecificVersion(
       qtIfwVersion,
-      installerExtension
+      installerExtension,
+      ARCH
     );
 
     core.info(`QtIFW Link: ${installerLink}`);
