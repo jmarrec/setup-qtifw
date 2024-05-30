@@ -12,7 +12,7 @@ outputs:
   qtifw-bin-dir:
     description: "The bin directory (which is already added to your PATH) for debugging purposes."
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
   icon: 'code'
