@@ -87,8 +87,10 @@ async function runInstallQtIFW(qtIFWPath: string) {
     options
   );
 
-  const qsPath = path.join(workingDirectory, scriptName);
-  fs.writeFileSync(qsPath, QT_IFW_INSTALL_SCRIPT_QS);
+  // TODO: remove? Since 4.0.0, you can use the CLI feature rather than the
+  // install script
+  // const qsPath = path.join(workingDirectory, scriptName);
+  // fs.writeFileSync(qsPath, QT_IFW_INSTALL_SCRIPT_QS);
 
   let platformOpts: string = '';
 
@@ -143,24 +145,13 @@ async function runInstallQtIFW(qtIFWPath: string) {
     // Chmod +x the .run file
     core.info('Chmod +x');
     fs.chmodSync(qtIFWPath, '0755');
-    // await exec.exec('bash', ['chmod', '+x', path.basename(qtIFWPath)], options);
-    platformOpts = '--platform minimal';
-    if (!process.env['XDG_RUNTIME_DIR']) {
-      const xdg_dir = path.join('/tmp/', uuidV4());
-      fs.mkdirSync(xdg_dir, '0700');
-      process.env['XDG_RUNTIME_DIR'] = xdg_dir;
-    }
   }
   core.debug('Will try to run the installer now');
   const installDir = path.join(workingDirectory, 'install');
 
   try {
     core.debug(
-      `${qtIFWPath} --verbose ${platformOpts} --script ${qsPath} TargetDir=${installDir}`
-    );
-    core.debug(`options.cwd=${options.cwd}`);
-    core.debug(
-      `./${exeName} --verbose ${platformOpts} --script ./${scriptName} TargetDir=./install}`
+      `${qtIFWPath} --accept-licenses --default-answer --confirm-command --root ${installDir} install`
     );
     const return_code = await exec.exec(
       'bash',
@@ -170,7 +161,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
         '-eo',
         'pipefail',
         '-c',
-        `./${exeName} --verbose ${platformOpts} --script ./${scriptName} TargetDir=./install`
+        `./${exeName} --accept-licenses --default-answer --confirm-command --root ${installDir} install`
       ],
       options
     );
@@ -179,6 +170,22 @@ async function runInstallQtIFW(qtIFWPath: string) {
     }
   } catch (error: any) {
     throw `Something went wrong during the installation: ${error.message}`;
+  }
+
+  if (IS_DARWIN) {
+    // Unmount
+    await exec.exec(
+      'bash',
+      [
+        '-noprofile',
+        '--norc',
+        '-eo',
+        'pipefail',
+        '-c',
+        'hdiutil detach ./qtifw_installer'
+      ],
+      options
+    );
   }
 
   const binDir = path.join(installDir, 'bin/');
