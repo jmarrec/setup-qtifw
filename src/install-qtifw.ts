@@ -161,7 +161,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
         '-eo',
         'pipefail',
         '-c',
-        `./${exeName} --accept-licenses --default-answer --confirm-command --root ${installDir} install`
+        `./${exeName} --accept-licenses --default-answer --confirm-command --root $(pwd)/install install`
       ],
       options
     );
@@ -188,7 +188,7 @@ async function runInstallQtIFW(qtIFWPath: string) {
     );
   }
 
-  const binDir = path.join(installDir, 'bin/');
+  const binDir = path.join(installDir, 'bin');
   core.info(`Adding '${binDir}' to PATH`);
   core.setOutput('qtifw-bin-dir', binDir);
   core.addPath(binDir);

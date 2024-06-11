@@ -372,7 +372,7 @@ function runInstallQtIFW(qtIFWPath) {
                 '-eo',
                 'pipefail',
                 '-c',
-                `./${exeName} --accept-licenses --default-answer --confirm-command --root ${installDir} install`
+                `./${exeName} --accept-licenses --default-answer --confirm-command --root $(pwd)/install install`
             ], options);
             if (return_code != 0) {
                 throw 'Something went wrong during the installation';
@@ -392,7 +392,7 @@ function runInstallQtIFW(qtIFWPath) {
                 'hdiutil detach ./qtifw_installer'
             ], options);
         }
-        const binDir = path.join(installDir, 'bin/');
+        const binDir = path.join(installDir, 'bin');
         core.info(`Adding '${binDir}' to PATH`);
         core.setOutput('qtifw-bin-dir', binDir);
         core.addPath(binDir);
