@@ -28,6 +28,12 @@ jobs:
       - name: Test that the binaries are correctly added to path
         shell: bash
         run: |
-          devtool --version
+          set -x
           which binarycreator
           ls -la $(which binarycreator)
+          # try running it
+          binarycreator --help
+          installerbase --version
+          archivegen --version
+          devtool --version
+          repogen --help || true  # returns exit 1 for some freaking reason
