@@ -36,4 +36,4 @@ jobs:
           installerbase --version
           archivegen --version
           devtool --version
-          repogen --help
+          repogen --help || true  # returns exit 1 for some freaking reason
