@@ -408,7 +408,7 @@ function installRequiredSystemDeps() {
             if (utils_1.IS_LINUX) {
                 core.info('Running apt-get update');
                 yield exec.exec('sudo', ['apt-get', 'update'], { silent: true });
-                core.info('Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-xinerama0-dev libxcb-randr0-dev libxcb-shape0 libxcb-cursor0 libdbus-1-3');
+                core.info('Installing required system libraries: libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-xinerama0-dev libxcb-randr0-dev libxcb-shape0 libxcb-cursor0 libdbus-1-3 libwebp-dev');
                 yield exec.exec('sudo', [
                     'apt-get',
                     '-y',
@@ -429,6 +429,7 @@ function installRequiredSystemDeps() {
                 ], { silent: true });
                 if (utils_1.ARCH == 'arm64') {
                     if (!fs_1.default.existsSync('/lib/aarch64-linux-gnu/libwebp.so.6')) {
+                        core.info('Linux arm64: libwebp.so from installer is outdated, symlink: ln -sf libwebp.so.7 /lib/aarch64-linux-gnu/libwebp.so.6');
                         // fs.symlinkSync('libwebp.so.7', '/lib/aarch64-linux-gnu/libwebp.so.6')
                         yield exec.exec('sudo', [
                             'ln',
@@ -438,6 +439,7 @@ function installRequiredSystemDeps() {
                         ], { silent: true });
                     }
                     if (!fs_1.default.existsSync('/lib/aarch64-linux-gnu/libtiff.so.5')) {
+                        core.info('Linux arm64: libtiff.so from installer is outdated, symlink: ln -sf libtiff.so.6 /lib/aarch64-linux-gnu/libtiff.so.5');
                         yield exec.exec('sudo', [
                             'ln',
                             '-sf',
