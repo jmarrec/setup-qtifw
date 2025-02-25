@@ -7,7 +7,7 @@ import {getMirrorLinkForSpecificLink} from './find-qtifw';
 import {v4 as uuidV4} from 'uuid';
 import {ExecOptions} from '@actions/exec/lib/interfaces';
 
-import {IS_DARWIN, IS_LINUX, QT_IFW_INSTALL_SCRIPT_QS} from './utils';
+import {IS_DARWIN, IS_LINUX, QT_IFW_INSTALL_SCRIPT_QS, ARCH} from './utils';
 
 export function getWorkingQtIFWWorkingDirectory() {
   let qtIFWPathDestDir: string;
@@ -221,10 +221,38 @@ export async function installRequiredSystemDeps() {
           'libxcb-randr0-dev',
           'libxcb-shape0',
           'libxcb-cursor0',
-          'libdbus-1-3'
+          'libdbus-1-3',
+          'libwebp-dev'
         ],
         {silent: true}
       );
+      if (ARCH == 'arm64') {
+        if (!fs.existsSync('/lib/aarch64-linux-gnu/libwebp.so.6')) {
+          // fs.symlinkSync('libwebp.so.7', '/lib/aarch64-linux-gnu/libwebp.so.6')
+          await exec.exec(
+            'sudo',
+            [
+              'ln',
+              '-sf',
+              'libwebp.so.7',
+              '/lib/aarch64-linux-gnu/libwebp.so.6'
+            ],
+            {silent: true}
+          );
+        }
+        if (!fs.existsSync('/lib/aarch64-linux-gnu/libtiff.so.5')) {
+          await exec.exec(
+            'sudo',
+            [
+              'ln',
+              '-sf',
+              'libtiff.so.6',
+              '/lib/aarch64-linux-gnu/libtiff.so.5'
+            ],
+            {silent: true}
+          );
+        }
+      }
     }
   }
 }

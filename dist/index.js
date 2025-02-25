@@ -424,8 +424,28 @@ function installRequiredSystemDeps() {
                     'libxcb-randr0-dev',
                     'libxcb-shape0',
                     'libxcb-cursor0',
-                    'libdbus-1-3'
+                    'libdbus-1-3',
+                    'libwebp-dev'
                 ], { silent: true });
+                if (utils_1.ARCH == 'arm64') {
+                    if (!fs_1.default.existsSync('/lib/aarch64-linux-gnu/libwebp.so.6')) {
+                        // fs.symlinkSync('libwebp.so.7', '/lib/aarch64-linux-gnu/libwebp.so.6')
+                        yield exec.exec('sudo', [
+                            'ln',
+                            '-sf',
+                            'libwebp.so.7',
+                            '/lib/aarch64-linux-gnu/libwebp.so.6'
+                        ], { silent: true });
+                    }
+                    if (!fs_1.default.existsSync('/lib/aarch64-linux-gnu/libtiff.so.5')) {
+                        yield exec.exec('sudo', [
+                            'ln',
+                            '-sf',
+                            'libtiff.so.6',
+                            '/lib/aarch64-linux-gnu/libtiff.so.5'
+                        ], { silent: true });
+                    }
+                }
             }
         }
     });
